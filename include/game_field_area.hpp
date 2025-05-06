@@ -15,17 +15,27 @@ struct IGameFieldArea {
         , upperLeftCorner_(upperLeftCorner)
         , lowerRightCorner_(lowerRightCorner)
     {}
-
+    
+    // TODO: добавить блокировку ввода
     virtual bool isCellAvailable(int xidx, int yidx) const noexcept = 0;
     virtual void setCell(int xidx, int yidx, const cell_t& cell) = 0;
-    virtual cell_t getCell(int xidx, int yidx) const = 0;
+    virtual const cell_t& getCell(int xidx, int yidx) const = 0;
+    virtual cell_t& getCell(int xidx, int yidx) = 0;
+    virtual std::pair<int, int> getUpperLeftCorner() const noexcept {
+        return upperLeftCorner_; 
+    }
+    virtual std::pair<int, int> getLowerRightCorner() const noexcept {
+        return lowerRightCorner_;
+    }
+    virtual int width() const noexcept = 0;
+    virtual int height() const noexcept = 0;
 
     virtual ~IGameFieldArea() {} 
 
 protected:
     std::shared_ptr<game_field::IGameField<cell_t>> field_;
-    std::pair<int> upperLeftCorner_;
-    std::pair<int> lowerRightCorner_;
+    std::pair<int, int> upperLeftCorner_;
+    std::pair<int, int> lowerRightCorner_;
 };
 
 template <class cell_t>
@@ -37,7 +47,6 @@ bool IGameFieldArea<cell_t>::isCellAvailable(
            yidx <= upperLeftCorner_.second &&
            yidx >= lowerRightCorner_.first;
 }
-
 
 template <class cell_t>
 class GameFieldArea : 
@@ -61,9 +70,26 @@ public:
         field_->setCell(xidx, yidx, cell);
     }
 
-    cell_t getCell(int xidx, int yidx) const override {
+    const cell_t& getCell(int xidx, int yidx) const override {
         verifyThenThrowCellPos_(xidx, yidx);
         return field_->getCell(xidx, yidx);
+    }
+
+    cell_t& getCell(int xidx, int yidx) override {
+        verifyThenThrowCellPos_(xidx, yidx);
+        return field_->getCell(xidx, yidx);
+    }
+
+    int width() const noexcept override {
+        return lowerRightCorner_.first 
+                - upperLeftCorner_.first
+                - 1;
+    }
+
+    int height() const noexcept override {
+        return upperLeftCorner_.second 
+                - lowerRightCorner.second
+                - 1;
     }
 
 private:

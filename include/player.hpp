@@ -7,15 +7,19 @@
 
 namespace player {
 
-template <class cell_t>
+template <class creature_t, template <class> class cell_t>
 class Player : public observer::IObserver {
-    using IGameFieldArea = game_field_area::IGameFieldArea;
+    using IGameFieldArea 
+        = game_field_area::IGameFieldArea<cell_t<creature_t>>;
+    using IUserInput = user_input::IUserInput;
 
 public:
-    Player(std::shared_ptr<IGameFieldArea> area, cell_t playerCell) : 
+    Player(std::shared_ptr<IGameFieldArea> area,
+           std::shared_ptr<IUserInput> input, 
+           creature_t playerCreature) : 
         area_(area)
-        , playerCell_(playerCell)
-
+        , creature_(playerCreature)
+        , input_(input)
     {}
     
 public:
@@ -35,16 +39,21 @@ public:
         }   
     }
 
+    const creature_t& creature() const noexcept {
+        return creature;
+    }
+
 private:
     void setOneCell_() {
         auto [x, y] = input_->lastInput(); // TODO
         if (area_->isCellAvailable(x, y)) {
-            area_->setCell(x, y, playerCell_);
+            auto&& cell = area_->getCell();
+            cell.setCreature(creature_); 
         }
     }
 
 private:   
-    cell_t playerCell_;
+    creature_t creature_;
     std::shared_ptr<IUserInput> input_; // TODO
     std::shared_ptr<IGameFieldArea> area_;
 };

@@ -1,0 +1,38 @@
+#ifndef GAME_MODEL_HPP
+#define GAME_MODEL_HPP
+
+#include <memory>
+#include <utility>
+#include <map>
+
+#include "creature.hpp"
+#include "cell.hpp"
+#include "game_field_area.hpp"
+
+namespace game_model {
+
+struct IGameModel {
+    virtual std::pair<bool, creature::ICreature> compute() = 0;
+    virtual ~IGameModel() {}
+};
+
+class GameModel : public IGameModel {
+    using Creature = creature::Creature;
+    using Cell = cell::Cell<Creature>;
+    using IGameFieldArea = game_field_area::IGameFieldArea<Cell>;
+
+public:
+    GameModel(std::unique_ptr<IGameFieldArea> area, int playerCount);    
+    std::pair<bool, creature::ICreature> compute() override;
+
+private:
+    std::map<int, int> countNeighbors_(int xidx, int yidx) const;
+
+private:
+    std::unique_ptr<IGameFieldArea> area_;
+    int playerCount_;
+};
+
+} // namespace game_model
+
+#endif 

@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <utility>
-#include <stddef.h>
+#include <tuple>
 #include <stdexcept>
 
 #include "game_event.hpp"
@@ -15,11 +15,12 @@ namespace game_field {
 
 template <class cell_t> 
 struct IGameField : public subject::ISubject {
-    virtual void setCell(int xidx, int yidx, const cell_t& val) = 0;
+    virtual void setCell(int xidx, int yidx, const cell_t& cell) = 0;
     virtual const cell_t& getCell(int xidx, int yidx) const = 0; 
+    virtual cell_t& getCell(int xidx, int yidx) = 0; 
+    virtual void clear() = 0;
     virtual int width() const noexcept = 0
-    virtual height() const noexcept = 0;
-    
+    virtual int height() const noexcept = 0;
     virtual ~IGameField() {}
 };
 
@@ -41,13 +42,22 @@ public:
 public:
     void setCell(int xidx, int yidx, const cell_t& cell) override {
         verifyThenThrowCellPos_(xidx, yidx);
-        return field_.at(yidx).at(yidx) = cell;
+        field_.at(yidx).at(yidx) = cell;
         fireGameFieldUpdate_();
     }
 
     const cell_t& getCell(int xidx, int yidx) const override {
         verifyThenThrowCellPos_(xidx, yidx);
         return field_.at(yidx).at(yidx);
+    }
+
+    cell_t& getCell(int xidx, int yidx) override {
+        verifyThenThrowCellPos_(xidx, yidx);
+        return field_.at(yidx).at(yidx);
+    }
+
+    void clear() override {
+        field_.clear();
     }
 
     int width() const noexcept override {
