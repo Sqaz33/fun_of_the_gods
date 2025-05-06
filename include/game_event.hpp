@@ -7,7 +7,7 @@ enum class event_t : int;
 
 enum class event_t : int {
     GAME_FIELD_UPDATE = 0,
-    ___
+    USER_INPUT
 };
 
 } // game_event 

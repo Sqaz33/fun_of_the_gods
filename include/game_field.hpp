@@ -15,9 +15,9 @@ namespace game_field {
 
 template <class cell_t> 
 struct IGameField : public subject::ISubject {
-    virtual void setCell(size_t xidx, size_t yidx, const cell_t& val) = 0;
-    virtual const cell_t& getCell(size_t xidx, size_t yidx) const = 0; 
-    virtual size_t width() const noexcept = 0
+    virtual void setCell(int xidx, int yidx, const cell_t& val) = 0;
+    virtual const cell_t& getCell(int xidx, int yidx) const = 0; 
+    virtual int width() const noexcept = 0
     virtual height() const noexcept = 0;
     
     virtual ~IGameField() {}
@@ -32,34 +32,34 @@ private:
     using ISubject = subject::ISubject;
 
 public:
-    GameField(size_t width, size_t height, const cell_t& init,
-            const std::vector<std::pair<size_t, size_t>& excludedCells) :
+    GameField(int width, int height, const cell_t& init,
+            const std::vector<std::pair<int, int>& excludedCells) :
         field_(height, std::vector<cell_t>(width, init))
         , exludedCells_(excludedCells.begin(), excludedCells.end())
     {}
     
 public:
-    void setCell(size_t xidx, size_t yidx, const cell_t& cell) override {
+    void setCell(int xidx, int yidx, const cell_t& cell) override {
         verifyThenThrowCellPos_(xidx, yidx);
         return field_.at(yidx).at(yidx) = cell;
         fireGameFieldUpdate_();
     }
 
-    const cell_t& getCell(size_t xidx, size_t yidx) const override {
+    const cell_t& getCell(int xidx, int yidx) const override {
         verifyThenThrowCellPos_(xidx, yidx);
         return field_.at(yidx).at(yidx);
     }
 
-    size_t width() const noexcept override {
+    int width() const noexcept override {
         return field_.back().size();
     }
 
-    size_t height() const noexcept override {
+    int height() const noexcept override {
         return field_.size();
     }
 
 public:
-    bool isExludedCell(size_t xidx, size_t yidx) const {
+    bool isExludedCell(int xidx, int yidx) const {
         return excludedCells_.contains({xidx, yidx});
     }
 
@@ -80,7 +80,7 @@ protected:
     }
 
 private:
-    void verifyThenThrowCellPos_(size_t xidx, size_t yidx) {
+    void verifyThenThrowCellPos_(int xidx, int yidx) {
         if (isExludedCell(xidx, yidx)) {
             throw std::logic_error("Accessing a forbidden cell.");
         }
@@ -94,7 +94,7 @@ private:
 
 private:
     std::vector<std::vector<cell_t>> field_;
-    std::set<std::pair<size_t, size_t>> excludedCells_;
+    std::set<std::pair<int, int>> excludedCells_;
 };
 
 } // namespace game_field
