@@ -23,46 +23,17 @@ GameModel::GameModel(
     , playerCount_(playerCount)
 {}
 
-std::pair<bool, creature::ICreature> GameModel::compute() {
-    std::vector<std::tuple<int, bool, int, int>> aside;
-
-    auto corner = area_->getUpperLeftCorner();
-    auto limW = area_->width() + corner.first;
-    auto limH = area_->height() + corner.second;
-    for (auto y = corner.second; y < limH; ++y) {
-        for (auto x = corner.first; x < limW; ++x) {
-            if (area_->isCellAvailable(x, y)) {
-                auto ne = countNeighbors_(x, y);
-                int neSum = std::accumulate(ne.begin(), ne.end(), 
-                                0, [] (auto&& p) { return p.second; });
-                auto&& cell = area_->getCell(x, y);
-                auto&& cr = cell.creature();
-                bool isAlive = cr.isAlive();
-                if (computeLiveStatusConwayGame(isAlive, neSum)) {
-                    if (!isAlive) {
-                        auto max = std::max_element(ne.begin(), ne.end(), 
-                                                    [] (auto&& p) { return p.second; });
-                        int id = max->first;
-                        aside.emplace_back(id, true, x, y);
-                    }
-                } else {
-                    aside.emplace_back(0, false, x, y);
-                }
-            }
-        }
+std::pair<bool, int> GameModel::compute() {
+    computeAside_();
+    applyNClearAside_();
+    auto count = countCreatureInArea_();
+    if (count.size() < 2) {
+        if (count.size() == 1) {
+            return {false, count.begin()->first};
+        } 
+        return {false, -1};
     }
-
-    for (auto&& as : aside) {
-        auto [id, isAlive, x, y] = as;
-        auto&& cell = area_->getCell(x, y);
-        auto&& cr = cell.creature();
-        cr.setID(id);
-        if (isAlive) {
-            cr.revive();
-        } else {
-            cr.kill(); 
-        }
-    }
+    return {true, 0};
 } 
 
 std::map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
@@ -88,6 +59,71 @@ std::map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
         }
     }
 
+    return res;
+}
+
+void GameModel::computeAside_() {
+    auto corner = area_->getUpperLeftCorner();
+    auto limW = area_->width() + corner.first;
+    auto limH = area_->height() + corner.second;
+    for (auto y = corner.second; y < limH; ++y) {
+        for (auto x = corner.first; x < limW; ++x) {
+            if (area_->isCellAvailable(x, y)) {
+                auto ne = countNeighbors_(x, y);
+                int neSum = std::accumulate(ne.begin(), ne.end(), 
+                                0, [] (auto&& p) { return p.second; });
+                auto&& cell = area_->getCell(x, y);
+                auto&& cr = cell.creature();
+                bool isAlive = cr.isAlive();
+                if (computeLiveStatusConwayGame(isAlive, neSum)) {
+                    if (!isAlive) {
+                        auto max = std::max_element(ne.begin(), ne.end(), 
+                                                    [] (auto&& p) { return p.second; });
+                        int id = max->first;
+                        aside_.emplace_back(id, true, x, y);
+                    }
+                } else {
+                    aside_.emplace_back(0, false, x, y);
+                }
+            }
+        }
+    }
+}
+
+void GameModel::applyNClearAside_() {
+    for (auto&& as : aside_) {
+        auto [id, isAlive, x, y] = as;
+        auto&& cell = area_->getCell(x, y);
+        auto&& cr = cell.creature();
+        cr.setID(id);
+        if (isAlive) {
+            cr.revive();
+        } else {
+            cr.kill(); 
+        }
+    }
+    aside_.clear();
+}
+
+std::map<int, int> GameModel::countCreatureInArea_() {
+    std::map<int, int> res;
+    auto corner = area_->getUpperLeftCorner();
+    auto limW = area_->width() + corner.first;
+    auto limH = area_->height() + corner.second;
+    for (auto y = corner.second; y < limH; ++y) {
+        for (auto x = corner.first; x < limW; ++x) {
+            if (area_->isCellAvailable(x, y)) {
+                auto&& cell = area_->getCell(x, y);
+                auto&& cr = cell.creature();
+                auto it = res.find(cr.id());
+                if (it != res.end()) {
+                    ++it->second;
+                } else {
+                    res[cr.id()] = 0;
+                }
+            }
+        }
+    }
     return res;
 }
 
