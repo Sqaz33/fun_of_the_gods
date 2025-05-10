@@ -27,26 +27,19 @@ public:
         std::weak_ptr<subject::ISubject> subj, int event_t) override final 
     { 
         auto evt = static_cast<game_event::event_t>(event_t);
-        if (game_event::event_t::USER_INPUT == evt) 
+        if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) 
             setOneCell_();
     }
     
 public:
-    void setCells(int k) {
-        input_->clearInput(); // TODO
-        while (k--) {
-            input_->readInput(); // TODO
-        }   
-    }
-
     const creature_t& creature() const noexcept {
         return creature;
     }
 
 private:
     void setOneCell_() {
-        auto [x, y] = input_->lastInput(); // TODO
-        if (area_->isCellAvailable(x, y)) {
+        auto [suc, x, y] = input_->lastCoordInput();
+        if (suc && area_->isCellAvailable(x, y)) {
             auto&& cell = area_->getCell();
             cell.setCreature(creature_); 
         }
@@ -54,7 +47,7 @@ private:
 
 private:   
     creature_t creature_;
-    std::shared_ptr<IUserInput> input_; // TODO
+    std::shared_ptr<IUserInput> input_; 
     std::shared_ptr<IGameFieldArea> area_;
 };
 

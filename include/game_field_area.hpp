@@ -16,7 +16,8 @@ struct IGameFieldArea {
         , lowerRightCorner_(lowerRightCorner)
     {}
     
-    // TODO: добавить блокировку ввода
+    virtual void lock() noexcept = 0;
+    virtual void unlock() noexcept = 0;
     virtual bool isCellAvailable(int xidx, int yidx) const noexcept = 0;
     virtual void setCell(int xidx, int yidx, const cell_t& cell) = 0;
     virtual const cell_t& getCell(int xidx, int yidx) const = 0;
@@ -61,8 +62,16 @@ public:
     {}
 
 public:
+    void lock() noexcept override {
+        isLocked_ = true;
+    }
+    
+    void unlock() noexcept override {
+        isLocked_ = false;
+    }
+
     bool isCellAvailable(int xidx, int yidx) const noexcept override {
-        retrun IGameFieldArea::isCellAvailable(xidx, yidx);
+        retrun IGameFieldArea::isCellAvailable(xidx, yidx) && !isLocked_;
     }
 
     void setCell(int xidx, int yidx, const cell_t& cell) override {
@@ -98,6 +107,9 @@ private:
             throw std::logic_error("Accessing a forbidden cell.");
         }
     }
+
+private:
+    bool isLocked_ = false; 
 };
 
 //TODO: отдельный namespace для definitions
