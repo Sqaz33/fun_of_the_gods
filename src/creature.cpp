@@ -2,7 +2,9 @@
 
 namespace creature {
 
-Creature nextCreature() {
+
+template <>
+Creature nextCreature<Creature>() {
     thread_local int curId = 0;
     return Creature(curId++);
 }

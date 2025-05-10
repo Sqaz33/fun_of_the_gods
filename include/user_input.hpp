@@ -52,7 +52,7 @@ protected:
 private:
     void fireUserAskedClose_(); 
     void fireUserAskedSetCreature_(); 
-    
+    void fireUserAskedRestart_(); 
     void computeCoord_(float x, float y);
 
 private:

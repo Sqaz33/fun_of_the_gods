@@ -19,7 +19,12 @@ struct ICreature {
 };
 
 class Creature : public ICreature; 
-Creature nextCreature();
+
+template <class creature_t> 
+creature_t nextCreature();
+
+template <>
+Creature nextCreature<Creature>();
 
 class Creature : public ICreature {
 public:

@@ -30,6 +30,11 @@ void UserInput::readInput() {
             auto pos = mouse->position;
             computeCoord_(pos.x, pos.y);
             fireUserAskedSetCreature_();
+        } else if(
+            auto key = evt->getIf<sf::Event::KeyPressed>(); 
+            key->scancode == sf::Keyboard::Scancode::Escape) 
+        {
+            fireUserAskedRestart_();
         }
     }
 }
@@ -62,6 +67,11 @@ void UserInput::fireUserAskedClose_() {
 void UserInput::fireUserAskedSetCreature_() {
     notify(
         game_event::event_t::USER_ASKED_SET_CREATURE, slf());
+}
+
+void UserInput::fireUserAskedRestart_() {
+    notify(
+        game_event::event_t::USER_ASKED_RESTART, slf());
 }
 
 } // namespace user_input
