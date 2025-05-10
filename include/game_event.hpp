@@ -10,7 +10,7 @@ enum class event_t : int {
     USER_ASKED_CLOSE,
     USER_ASKED_RESTART,
     USER_ASKED_SET_CREATURE,
-    PLAYER_KILL_CREATURE,
+    PLAYER_KILL_CREATURE
 };
 
 } // game_event 

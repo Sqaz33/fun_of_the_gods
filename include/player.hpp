@@ -1,6 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include "user_input.hpp"
 #include "observer.hpp"
 #include "subject.hpp"
 #include "game_event.hpp"
@@ -16,25 +17,29 @@ class Player :
 {
     using IGameFieldArea 
         = game_field_area::IGameFieldArea<cell_t<creature_t>>;
-    using IUserInput = user_input::IUserInput;
     using ISubject = subject::ISubject;
 
 public:
-    Player(std::shared_ptr<IGameFieldArea> area,
-           std::shared_ptr<IUserInput> input, 
+    Player(std::unique_ptr<IGameFieldArea> area,
            creature_t playerCreature) : 
-        area_(area)
+        area_(std::move(area))
         , creature_(playerCreature)
-        , input_(input)
     {}
+
+    Player() = default;
     
 public:
     void update(
-        std::weak_ptr<subject::ISubject> subj, int event_t) override final 
+        std::weak_ptr<subject::ISubject> subj, int event_t) override
     { 
         auto evt = static_cast<game_event::event_t>(event_t);
-        if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) 
-            setOneCell_();
+        if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) {
+            auto lk = subj.lock();
+            auto input = 
+                std::dynamic_pointer_cast<user_input::IUserInput>(lk)
+            auto [suc, x, y] = input->lastCoordInput()
+            if (suc) setOneCell_(x, y);
+        }
     }
 
 public:
@@ -51,12 +56,24 @@ public:
         return creature;
     }
 
+    void setCreature(const creature_t& cr) {
+        creature_ = cr;
+    }
+    
+    
+    decltype(auto) fieldArea() {
+        return *area_;
+    }
+
+    void setFieldArea(std::unique_ptr<IGameFieldArea> area) {
+        area_ = std::move(area);
+    }
+    
     auto slf() { return shared_from_this(); }
 
 private:
-    void setOneCell_() {
-        auto [suc, x, y] = input_->lastCoordInput();
-        if (suc && area_->isCellAvailable(x, y)) {
+    void setOneCell_(int x, int y) {
+        if (area_->isCellAvailable(x, y)) {
             auto&& cell = area_->getCell();
             auto&& cr = cell.creature();
             if (cr.isAlive() && cr.id() == creature_.id()) {
@@ -76,8 +93,7 @@ private:
 
 private:   
     creature_t creature_;
-    std::shared_ptr<IUserInput> input_; 
-    std::shared_ptr<IGameFieldArea> area_;
+    std::unique_ptr<IGameFieldArea> area_;
 };
 
 } // namespace player

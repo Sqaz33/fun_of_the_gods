@@ -8,11 +8,9 @@ namespace game_field_area {
 template <class cell_t>
 struct IGameFieldArea {
     IGameFieldArea(
-            std::shared_ptr<game_field::GameField<cell_t>> field,
             std::pair<int, int> upperLeftCorner, 
             std::pair<int, int> lowerRightCorner):
-        field_(field)
-        , upperLeftCorner_(upperLeftCorner)
+        upperLeftCorner_(upperLeftCorner)
         , lowerRightCorner_(lowerRightCorner)
     {}
     
@@ -34,7 +32,6 @@ struct IGameFieldArea {
     virtual ~IGameFieldArea() {} 
 
 protected:
-    std::shared_ptr<game_field::IGameField<cell_t>> field_;
     std::pair<int, int> upperLeftCorner_;
     std::pair<int, int> lowerRightCorner_;
 };
@@ -50,16 +47,25 @@ bool IGameFieldArea<cell_t>::isCellAvailable(
 }
 
 template <class cell_t>
-class GameFieldArea : 
+class GameFieldExcludedCellsArea : 
     public IGameFieldArea<cell_t> 
 {
+    using GameFieldExcludedCells = game_field::GameFieldExcludedCells;
 public:
-    GameFieldArea(
-            std::shared_ptr<game_field::GameField<cell_t>> field,
+    GameFieldExcludedCellsArea(
+            std::shared_ptr<GameFieldExcludedCells<cell_t>> field,
             std::pair<int, int> upperLeftCorner, 
             std::pair<int, int> lowerRightCorner) :
-        IGameFieldArea(field, upperLeftCorner, lowerRightCorner)
-    {}
+        , IGameFieldArea<cell_t>(upperLeftCorner, lowerRightCorner)
+    {
+        if (!std::dynamic_pointer_cast<
+            game_field::GameFieldExcludedCells<cell_t>>(field))
+        {
+            throw std::logic_error(
+                "The field should actually be an GameFieldExcludedCells<cell_t>");
+        } 
+        field_ = field_;
+    }
 
 public:
     void lock() noexcept override {
@@ -71,7 +77,9 @@ public:
     }
 
     bool isCellAvailable(int xidx, int yidx) const noexcept override {
-        retrun IGameFieldArea::isCellAvailable(xidx, yidx) && !isLocked_;
+        return IGameFieldArea::isCellAvailable(xidx, yidx) && 
+               !isLocked_ &&
+               !field_->isExludedCell(xidx, yidx)
     }
 
     void setCell(int xidx, int yidx, const cell_t& cell) override {
@@ -103,13 +111,14 @@ public:
 
 private:
     void verifyThenThrowCellPos_(int xidx, int yidx) {
-        if (isExludedCell(xidx, yidx)) {
+        if (!isCellAvailable(xidx, yidx)) {
             throw std::logic_error("Accessing a forbidden cell.");
         }
     }
 
 private:
     bool isLocked_ = false; 
+    std::shared_ptr<GameFieldExcludedCells<cell_t>> field_;
 };
 
 //TODO: отдельный namespace для definitions

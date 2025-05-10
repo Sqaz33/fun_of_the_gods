@@ -1,4 +1,4 @@
-TODO 1. UserInput: 
+TODO 1. UserInput:  ✓ 
             ISubject который содержит ссылку на окно и 
                 на DrawableGridCanvas читает 3 евента: 
                     1.1 нажатие на экран.
@@ -7,7 +7,7 @@ TODO 1. UserInput:
             Отправляет своим IObserver
     
         
-TODO  2. GameController: 
+TODO  2. GameController: □
             Принимает: 
                       DrawableGridCanvas, 
                       DrawableText,
@@ -20,3 +20,6 @@ TODO  2. GameController:
                                   вывести результат в DrawableText),
                               Дает каждому пользователю поставить или убить N существ. 
                             
+
+
+TODO: переименовать FieldArea во FieldView 

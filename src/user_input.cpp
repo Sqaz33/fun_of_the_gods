@@ -7,7 +7,7 @@
 namespace user_input {
 
 UserInput::UserInput(       
-        sf::Window* window, 
+        std::shared_ptr<sf::Window> window, 
         float startX, 
         float startY,
         int cellHeight
@@ -46,6 +46,8 @@ std::pair<int, int> UserInput::lastCoordInput() noexcept {
 void UserInput::computeCoord_(float x, float y) {
     decltype(lastCoordInput_) res;
     if (x >= startX_ && y >= startY_) {
+        x -= startX_; 
+        y -= startY_;
         res = {
             true,
             static_cast<int>(std::ceil(x / cellWidth_)),

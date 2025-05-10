@@ -19,7 +19,7 @@ struct IGameField : public subject::ISubject {
     virtual const cell_t& getCell(int xidx, int yidx) const = 0; 
     virtual cell_t& getCell(int xidx, int yidx) = 0; 
     virtual void clear() = 0;
-    virtual int width() const noexcept = 0
+    virtual int width() const noexcept = 0;
     virtual int height() const noexcept = 0;
     virtual ~IGameField() {}
 };
@@ -27,16 +27,17 @@ struct IGameField : public subject::ISubject {
 template <class cell_t> 
 class GameFieldExcludedCells :
     public IGameField<cell_t>
-    , public std::enable_shared_from_this<GameField>
+    , public std::enable_shared_from_this<
+                        GameFieldExcludedCells<cell_t>>
 {
 private:
     using ISubject = subject::ISubject;
 
 public:
-    GameField(int width, int height, const cell_t& init,
-            const std::vector<std::pair<int, int>& excludedCells) :
+    GameFieldExcludedCells(int width, int height, const cell_t& init,
+            const std::vector<std::pair<int, int>>& excludedCells) :
         field_(height, std::vector<cell_t>(width, init))
-        , exludedCells_(excludedCells.begin(), excludedCells.end())
+        , excludedCells_(excludedCells.begin(), excludedCells.end())
     {}
     
 public:
@@ -77,15 +78,15 @@ public:
 
 public:
     void attach(
-        std::shared_ptr<observer::IObserver> obs, int event_t) override final
+        std::shared_ptr<observer::IObserver> obs, int event_t) override
     { ISubject::attach(obs, event_t); }
 
     void detach(
-        std::weak_ptr<observer::IObserver> obs, int event_t) override final
+        std::weak_ptr<observer::IObserver> obs, int event_t) override
     { ISubject::detach(obs, event_t); }
 
 protected:
-    void notify(int event_t, std::weak_ptr<ISubject> slf) override final {
+    void notify(int event_t, std::weak_ptr<ISubject> slf) override {
         ISubject::notify(event_t, slf);
     }
 

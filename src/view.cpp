@@ -280,6 +280,19 @@ void DrawableGridCanvas::clear() {
     cells_.clear();
 }
 
+
+float DrawableGridCanvas::gridThickness() const noexcept {
+    return gridThickness_;
+}
+
+float DrawableGridCanvas::cellWidth() const noexcept {
+    return cellWidth_;
+}
+
+float DrawableGridCanvas::cellHeight() const noexcept {
+    return cellHeight_;
+}
+
 void DrawableGridCanvas::drawCellAt_(std::size_t cellX, 
                                      std::size_t cellY,
                                      sf::Vector2f start,

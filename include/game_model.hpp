@@ -16,6 +16,7 @@ struct IGameModel {
     virtual ~IGameModel() {}
 };
 
+// template <class creature_t, template<class> class cell_t>
 class GameModel : public IGameModel {
     using Creature = creature::Creature;
     using Cell = cell::Cell<Creature>;

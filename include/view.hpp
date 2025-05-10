@@ -11,11 +11,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include "tetromino.hpp"
-#include "tetris-game-model.hpp"
-
-using namespace tetris_game_model;
-
 namespace view {
 
 /**
@@ -146,8 +141,9 @@ public:
     
     void paintCell(std::pair<std::size_t, std::size_t> pos, sf::Color color);
     void clear();
-    sf::Color gridColor() const;
-    void setGridColor(sf::Color color);
+    float gridThickness() const noexcept;
+    float cellWidth() const noexcept;
+    float cellHeight() const noexcept;
 
 private:
     void drawCellAt_(std::size_t cellX, 

@@ -22,8 +22,8 @@ public:
         return creature_;
     }
 
-    void setCreature(const creature_t& creat) {
-        creature_ = creat;
+    void setCreature(const creature_t& cr) {
+        creature_ = cr;
     }
 
 private:

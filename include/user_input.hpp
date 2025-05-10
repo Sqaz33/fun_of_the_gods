@@ -56,7 +56,7 @@ private:
     void computeCoord_(float x, float y);
 
 private:
-    sf::Window* window_;
+    std::shared_ptr<sf::Window> window_;
     float startX_;
     float startY_;
     float cellWidth_;
