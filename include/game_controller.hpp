@@ -112,9 +112,9 @@ public:
 
 private:
     void redrawWindowNDisplay_() {
-        window_->clear(sf::Color::White);
         std::pair<unsigned, unsigned> windowSz = view_->size();
         window_->setSize({windowSz.first, windowSz.second});
+        window_->clear(sf::Color::White);
         view_->draw(*window_, {0.f, 0.f});
         window_->display();
     }
