@@ -3,7 +3,9 @@
 
 #include <memory>
 
-#include "subject.hpp"
+namespace subject {
+    struct ISubject;
+}
 
 namespace observer {
 

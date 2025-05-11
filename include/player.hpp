@@ -1,6 +1,8 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include <memory>
+
 #include "user_input.hpp"
 #include "observer.hpp"
 #include "subject.hpp"
@@ -13,11 +15,13 @@ template <class creature_t, template <class> class cell_t>
 class Player : 
     public observer::IObserver 
     , public subject::ISubject
-    , std::enable_shared_from_this<Player>
+    , public std::enable_shared_from_this<Player<creature_t, cell_t>>
 {
     using IGameFieldArea 
         = game_field_area::IGameFieldArea<cell_t<creature_t>>;
     using ISubject = subject::ISubject;
+    using sh_base_t = 
+        std::enable_shared_from_this<Player<creature_t, cell_t>>;
 
 public:
     Player(std::unique_ptr<IGameFieldArea> area,
@@ -36,8 +40,8 @@ public:
         if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) {
             auto lk = subj.lock();
             auto input = 
-                std::dynamic_pointer_cast<user_input::IUserInput>(lk)
-            auto [suc, x, y] = input->lastCoordInput()
+                std::dynamic_pointer_cast<user_input::IUserInput>(lk);
+            auto [suc, x, y] = input->lastCoordInput();
             if (suc) setOneCell_(x, y);
         }
     }
@@ -69,7 +73,7 @@ public:
         area_ = std::move(area);
     }
     
-    auto slf() { return shared_from_this(); }
+    auto slf() { return sh_base_t::shared_from_this(); }
 
 private:
     void setOneCell_(int x, int y) {

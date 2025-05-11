@@ -1,4 +1,5 @@
 #include "subject.hpp"
+#include "observer.hpp"
 
 #include <algorithm>
 

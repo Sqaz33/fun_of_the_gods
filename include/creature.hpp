@@ -12,24 +12,14 @@ struct ICreature {
     virtual bool isAlive() const noexcept = 0;
     virtual int id() const noexcept = 0;
     virtual void setId(int id) noexcept = 0;
-    virtual const std::string& color() const noexcept = 0;
-    virtual void setColor(const std::string& color) = 0;
 
     virtual ~ICreature() {}
 };
 
-class Creature : public ICreature; 
-
-template <class creature_t> 
-creature_t nextCreature();
-
-template <>
-Creature nextCreature<Creature>();
-
 class Creature : public ICreature {
 public:
+    Creature() = default;
     Creature(int id); 
-    Creature(int id, const std::string& color);
 
 public:
     void kill() noexcept override;
@@ -37,16 +27,19 @@ public:
     bool isAlive() const noexcept override;
     int id() const noexcept override;
     void setId(int id) noexcept override;
-    const std::string& color() const noexcept;
-    void setColor(const std::string& color) override;
-
     bool operator<(const Creature& cr);
 
 private:
-    int id_;
+    int id_ = -1;
     bool isAlive_ = false;
-    std::string color_;
 };
+
+template <class creature_t> 
+creature_t nextCreature();
+
+template <>
+Creature nextCreature<Creature>();
+
 
 } // namespace creature
 

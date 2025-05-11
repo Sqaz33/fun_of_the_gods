@@ -10,9 +10,9 @@ namespace factory {
 template <class cell_t>
 struct IGameFieldAreaFactory {
     virtual
-        std::unique_ptr<game_field_area::IGameFieldArea>
+        std::unique_ptr<game_field_area::IGameFieldArea<cell_t>>
     createArea(
-        std::shared_ptr<game_field::GameField<cell_t>> field,
+        std::shared_ptr<game_field::IGameField<cell_t>> field,
         std::pair<int, int> upperLeftCorner, 
         std::pair<int, int> lowerRightCorner) const = 0;
     virtual ~IGameFieldAreaFactory() {} 
@@ -23,12 +23,12 @@ class GameFieldExcludedCellsAreaFactory :
     public IGameFieldAreaFactory<cell_t>  
 {
 public:
-        std::unique_ptr<game_field_area::IGameFieldArea>
+        std::unique_ptr<game_field_area::IGameFieldArea<cell_t>>
     createArea(
-        std::shared_ptr<game_field::GameField<cell_t> field,
+        std::shared_ptr<game_field::IGameField<cell_t>> field,
         std::pair<int, int> upperLeftCorner, 
         std::pair<int, int> lowerRightCorner) const override
-    {   
+    {       
         return std::make_unique<
             game_field_area::GameFieldExcludedCellsArea<cell_t>>(
                 field,

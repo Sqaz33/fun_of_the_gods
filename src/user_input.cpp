@@ -10,13 +10,13 @@ UserInput::UserInput(
         std::shared_ptr<sf::Window> window, 
         float startX, 
         float startY,
-        int cellHeight
-        int cellWidth) :
+        float cellWidth,
+        float cellHeight):
     window_(window)
     , startX_(startX)
     , startY_(startY)
-    , cellHeight_(cellHeight)
     , cellWidth_(cellWidth)
+    , cellHeight_(cellHeight)
 {}
 
 void UserInput::readInput() {
@@ -25,7 +25,7 @@ void UserInput::readInput() {
             fireUserAskedClose_();
         } else if (
             auto mouse = evt->getIf<sf::Event::MouseButtonPressed>(); 
-            mouse->button == sf::Mouse::Button::Rigth) 
+            mouse->button == sf::Mouse::Button::Right) 
         {   
             auto pos = mouse->position;
             computeCoord_(pos.x, pos.y);
@@ -39,7 +39,7 @@ void UserInput::readInput() {
     }
 }
 
-std::pair<int, int> UserInput::lastCoordInput() noexcept {
+std::tuple<bool, int, int> UserInput::lastCoordInput() noexcept {
     return lastCoordInput_;
 }
 
@@ -62,18 +62,21 @@ std::shared_ptr<UserInput> UserInput::slf() {
 }
 
 void UserInput::fireUserAskedClose_() {
-    notify(
-        game_event::event_t::USER_ASKED_CLOSE, slf());
+    int evt = static_cast<int>(
+        game_event::event_t::USER_ASKED_CLOSE);
+    notify(evt, slf());
 } 
 
 void UserInput::fireUserAskedSetCreature_() {
-    notify(
-        game_event::event_t::USER_ASKED_SET_CREATURE, slf());
+    int evt = static_cast<int>(
+        game_event::event_t::USER_ASKED_SET_CREATURE)
+    notify(evt, slf());
 }
 
 void UserInput::fireUserAskedRestart_() {
-    notify(
-        game_event::event_t::USER_ASKED_RESTART, slf());
+    int evt = static_cast<int>(
+        game_event::event_t::USER_ASKED_RESTART)
+    notify(evt, slf());
 }
 
 } // namespace user_input

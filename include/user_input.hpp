@@ -22,15 +22,15 @@ class UserInput :
 {
 public:
     UserInput(
-        sf::Window* window, 
+        std::shared_ptr<sf::Window> window, 
         float startX, 
         float startY,
-        int fieldHeight
-        int fieldWidth);
+        float cellWidth,
+        float cellHeight);
 
 public:
     void readInput() override;
-    std::pair<int, int> lastCoordInput() noexcept override; 
+    std::tuple<bool, int, int> lastCoordInput() noexcept override; 
 
 public:
     std::shared_ptr<UserInput> slf();

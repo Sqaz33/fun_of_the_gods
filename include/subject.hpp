@@ -4,7 +4,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "observer.hpp"
+namespace observer {
+    struct IObserver;
+}
 
 namespace subject {
 

@@ -1,5 +1,5 @@
-#ifndef GAME_CONTROLLER_HPP
-#define GAME_CONTROLLER_HPP
+#ifndef GAME_EVENT_HPP
+#define GAME_EVENT_HPP
 
 namespace game_event {
 
@@ -15,4 +15,4 @@ enum class event_t : int {
 
 } // game_event 
 
-#endif // GAME_CONTROLLER_HPP
+#endif // GAME_EVENT_HPP

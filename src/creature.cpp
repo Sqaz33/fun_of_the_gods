@@ -2,12 +2,7 @@
 
 namespace creature {
 
-
-template <>
-Creature nextCreature<Creature>() {
-    thread_local int curId = 0;
-    return Creature(curId++);
-}
+Creature::Creature(int id) : id_(id) {}
 
 void Creature::kill() noexcept {
     isAlive_ = false;
@@ -28,22 +23,16 @@ void Creature::setId(int id) noexcept {
     id_ = id;
 }
 
-const std::string& Creature::color() const noexcept {
-    return color_;
-}
-
-void Creature::setColor(const std::string& color) {
-    color_ = color;
-}
-
 bool Creature::operator<(const Creature& cr) {
     return id_ < cr.id_;
 }
 
-Creature::Creature(int id) : id_(id) {}
-Creature::Creature(int id, const std::string& color) : 
-    id_(id)
-    , color_(color)
-{}
+
+template <>
+Creature nextCreature<Creature>() {
+    thread_local int curId = 0;
+    return Creature(curId++);
+}
+
 
 } // namespace creature

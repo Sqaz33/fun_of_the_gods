@@ -32,6 +32,8 @@ class GameFieldExcludedCells :
 {
 private:
     using ISubject = subject::ISubject;
+    using sh_base_t = std::enable_shared_from_this<
+                                GameFieldExcludedCells<cell_t>>;
 
 public:
     GameFieldExcludedCells(int width, int height, const cell_t& init,
@@ -74,7 +76,7 @@ public:
         return excludedCells_.contains({xidx, yidx});
     }
 
-    auto slf() { return shared_from_this(); }
+    auto slf() { return sh_base_t::shared_from_this(); }
 
 public:
     void attach(

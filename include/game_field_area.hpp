@@ -50,16 +50,17 @@ template <class cell_t>
 class GameFieldExcludedCellsArea : 
     public IGameFieldArea<cell_t> 
 {
-    using GameFieldExcludedCells = game_field::GameFieldExcludedCells;
+    using GameFieldExcludedCells = game_field::GameFieldExcludedCells<cell_t>;
+    using base_t = IGameFieldArea<cell_t>;
 public:
     GameFieldExcludedCellsArea(
-            std::shared_ptr<GameFieldExcludedCells<cell_t>> field,
+            std::shared_ptr<GameFieldExcludedCells> field,
             std::pair<int, int> upperLeftCorner, 
             std::pair<int, int> lowerRightCorner) :
-        , IGameFieldArea<cell_t>(upperLeftCorner, lowerRightCorner)
+            base_t(upperLeftCorner, lowerRightCorner)
     {
         if (!std::dynamic_pointer_cast<
-            game_field::GameFieldExcludedCells<cell_t>>(field))
+            game_field::GameFieldExcludedCells>(field))
         {
             throw std::logic_error(
                 "The field should actually be an GameFieldExcludedCells<cell_t>");
@@ -77,9 +78,9 @@ public:
     }
 
     bool isCellAvailable(int xidx, int yidx) const noexcept override {
-        return IGameFieldArea::isCellAvailable(xidx, yidx) && 
+        return base_t::IGameFieldArea::isCellAvailable(xidx, yidx) && 
                !isLocked_ &&
-               !field_->isExludedCell(xidx, yidx)
+               !field_->isExludedCell(xidx, yidx);
     }
 
     void setCell(int xidx, int yidx, const cell_t& cell) override {
@@ -98,14 +99,14 @@ public:
     }
 
     int width() const noexcept override {
-        return lowerRightCorner_.first 
-                - upperLeftCorner_.first
+        return base_t::lowerRightCorner_.first 
+                - base_t::upperLeftCorner_.first
                 - 1;
     }
 
     int height() const noexcept override {
-        return upperLeftCorner_.second 
-                - lowerRightCorner.second
+        return base_t::upperLeftCorner_.second 
+                - base_t::lowerRightCorner.second
                 - 1;
     }
 
@@ -118,7 +119,7 @@ private:
 
 private:
     bool isLocked_ = false; 
-    std::shared_ptr<GameFieldExcludedCells<cell_t>> field_;
+    std::shared_ptr<GameFieldExcludedCells> field_;
 };
 
 //TODO: отдельный namespace для definitions
