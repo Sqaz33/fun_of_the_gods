@@ -5,7 +5,7 @@ namespace cell {
 
 template <class creature_t>
 struct ICell {
-    virtual const creature_t& creature() const noexcept = 0;
+    virtual creature_t& creature() noexcept = 0;
     virtual void setCreature(const creature_t& creat) = 0;
     virtual ~ICell() {}
 }; 
@@ -18,11 +18,11 @@ public:
     {}
 
 public:
-    const creature_t& creature() const noexcept override {
+    creature_t& creature() noexcept override {
         return creature_;
     }
 
-    void setCreature(const creature_t& cr) {
+    void setCreature(const creature_t& cr) override{
         creature_ = cr;
     }
 

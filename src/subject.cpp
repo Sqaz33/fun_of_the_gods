@@ -11,9 +11,15 @@ void ISubject::attach(
 
 void ISubject::detach(
     std::weak_ptr<observer::IObserver> obs, int event_t) 
-{
+{   
+    if (obs.expired()) return;
+    auto lk = obs.lock();
     auto [begin, end] = obs_.equal_range(event_t);
-    auto pred = [obs] (auto& p) { return p.second == obs; };
+    auto pred = [lk] (auto&& p) { 
+        auto sec = p.second;
+        if (sec.expired()) return false; 
+        return sec.lock() == lk; 
+    };
     if (auto el = std::find_if(begin, end, pred); el != end) {
         obs_.erase(el);
     }

@@ -29,11 +29,19 @@ public:
         std::pair<int, int> upperLeftCorner, 
         std::pair<int, int> lowerRightCorner) const override
     {       
-        return std::make_unique<
-            game_field_area::GameFieldExcludedCellsArea<cell_t>>(
-                field,
-                upperLeftCorner,
-                lowerRightCorner);
+        if (auto f = std::dynamic_pointer_cast<
+                game_field::GameFieldExcludedCells<cell_t>>(field); !f)
+        {
+            throw std::logic_error(
+                "The field should actually be an GameFieldExcludedCells<cell_t>");
+        } else {
+            return std::make_unique<
+                game_field_area::GameFieldExcludedCellsArea<cell_t>>(
+                    f,
+                    upperLeftCorner,
+                    lowerRightCorner);
+        }
+
     }
 };
 

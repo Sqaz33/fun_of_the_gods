@@ -18,7 +18,7 @@ struct IUserInput : subject::ISubject {
 
 class UserInput : 
     public IUserInput 
-    , std::enable_shared_from_this<UserInput>
+    ,public std::enable_shared_from_this<UserInput>
 {
 public:
     UserInput(
@@ -26,7 +26,8 @@ public:
         float startX, 
         float startY,
         float cellWidth,
-        float cellHeight);
+        float cellHeight,
+        float gridThickness);
 
 public:
     void readInput() override;
@@ -53,7 +54,7 @@ private:
     void fireUserAskedClose_(); 
     void fireUserAskedSetCreature_(); 
     void fireUserAskedRestart_(); 
-    void computeCoord_(float x, float y);
+    void computeCoord_(int x, int y);
 
 private:
     std::shared_ptr<sf::Window> window_;
@@ -61,7 +62,8 @@ private:
     float startY_;
     float cellWidth_;
     float cellHeight_;
-    std::tuple<bool, int, int>  lastCoordInput_;
+    float gridThickness_;
+    std::tuple<bool, int, int>  lastCoordInput_ = {false, 0, 0};
 }; 
 
 }

@@ -117,7 +117,7 @@ void DrawableStackLayout::draw(sf::RenderWindow& window, sf::Vector2f start) {
 std::pair<float, float> DrawableStackLayout::size() const {
     if (components_.empty()) return {0., 0.};
 
-    float width = components_.front()->size().first;
+    float width = 0;
     float height = 0;
     for (const auto& comp : components_) {
         width = std::max(width, comp->size().first);
@@ -355,7 +355,7 @@ void DrawableText::draw(sf::RenderWindow& window, sf::Vector2f start) {
 
 std::pair<float, float> DrawableText::size() const {
     auto boundsSz = sfTxt_.getLocalBounds().size;
-    return {boundsSz.x, boundsSz.y + characterSize_};
+    return {boundsSz.x, boundsSz.y + characterSize_ * 2};
 }
 
 void DrawableText::setText(const std::string& txt) {

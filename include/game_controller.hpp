@@ -1,6 +1,8 @@
 #ifndef GAME_CONTROLLER_HPP
 #define GAME_CONTROLLER_HPP
 
+#include <chrono>
+#include <thread>
 #include <sstream>
 #include <unordered_map>
 
@@ -15,17 +17,14 @@
 namespace game_controller {
 
 template <class creature_t, template<class> class cell_t>
-class GameController : 
-    observer::IObserver<
-        GameController<cell_t<creature_t>>> 
-{
+class GameController : public observer::IObserver {
     using IGameField = game_field::IGameField<cell_t<creature_t>>;
     using IGameFieldArea = game_field_area::IGameFieldArea<cell_t<creature_t>>;
-    using IGameModel = game_model::IGameModel<cell_t<creature_t>>;
+    using IGameModel = game_model::IGameModel;
     using IUserInput = user_input::IUserInput;
     using IGameFieldAreaFactory = 
-        factory::IGameFieldAreaFactory<cell_t<creature_t>>
-    using Player = player::Player<cell_t<creature_t>>;
+        factory::IGameFieldAreaFactory<cell_t<creature_t>>;
+    using Player = player::Player<creature_t, cell_t>;
 
 public:
     GameController(
@@ -35,28 +34,29 @@ public:
             std::shared_ptr<IGameField> field,  
             std::unique_ptr<IGameFieldAreaFactory> areaFactory,
             std::unique_ptr<IGameModel> model,
-            std::shared_ptr<view::DrawableComposite> view,
-            const std::vector<Player>& players,
+            std::shared_ptr<view::IDrawableComposite> view,
+            const std::vector<std::shared_ptr<Player>>& players,
             std::shared_ptr<IUserInput> input,
             std::shared_ptr<sf::RenderWindow> window,
             const std::unordered_map<int, sf::Color>& creatureColors):
         K_(K)
         , T_(T)
         , N_(N)
-        , field_(std::move(field))
+        , field_(field)
         , areaFactory_(std::move(areaFactory))
         , model_(std::move(model))
         , view_(view)
         , players_(players)
         , input_(input)
         , window_(window)
-        , creatureColors_(creatureColors_)
+        , creatureColors_(creatureColors)
     { 
         std::pair<int, int> ul = {0, 0};
         std::pair<int, int> lr = {field_->width() - 1, 
                                     field_->height() - 1};
         
-        area_ = std::move(areaFactory_->create(field_, ul, lr));
+        area_ = std::move(areaFactory_->createArea(field_, ul, lr));
+        area_->unlock();
     }
 
 public:
@@ -66,23 +66,24 @@ public:
         using evt_t = game_event::event_t;
         auto evt = static_cast<evt_t>(event_t);
         switch (evt) {
-            case evt_t::USER_ASKED_ClOSE: {
+            case evt_t::USER_ASKED_CLOSE: {
                 askedClose_ = true;
                 break;
             } 
             case evt_t::USER_ASKED_RESTART: {
                 askedRestart_ = true;
+                restartController_();
                 break;
             }
             case evt_t::GAME_FIELD_UPDATE: {
-                updateGridCanvasInViewNUpdateWindow_()
+                updateGridCanvasInView_();
                 if (setupPhase_) {
                     --curN_;
                 }
                 break;
             } 
             case evt_t::PLAYER_KILL_CREATURE: {
-                updateGridCanvasInViewNUpdateWindow_()
+                updateGridCanvasInView_();
                 if (setupPhase_) {
                     ++curN_;
                 }
@@ -97,10 +98,10 @@ public:
         giveCreaturePlayers_();
         while (!askedClose_) {
             askedRestart_ = false;
-            setupFieldForPlayer_(K_);
-            while ((!askedRestart_) && (!winnerDeterminate_)) {    
+            setupField_(K_);
+            while ((!askedRestart_) && (!winnerDeterminate_) && (!askedClose_)) {    
+                setupField_(N_);
                 computeModel_(T_);
-                setupFieldForPlayer_(N_);
             }
             winnerDeterminate_ = false;
             while ((!askedRestart_) && (!askedClose_)) {
@@ -112,6 +113,8 @@ public:
 private:
     void redrawWindowNDisplay_() {
         window_->clear(sf::Color::White);
+        std::pair<unsigned, unsigned> windowSz = view_->size();
+        window_->setSize({windowSz.first, windowSz.second});
         view_->draw(*window_, {0.f, 0.f});
         window_->display();
     }
@@ -123,7 +126,7 @@ private:
                 "The view is missing the grid component");
         }
         if (auto grid = 
-            std::dynamic_pointer_cast<view::DrawableGridCanvas>())
+            std::dynamic_pointer_cast<view::DrawableGridCanvas>(comp))
         {   
             grid->clear();
             for (int y = 0; y < field_->height(); ++y) {
@@ -133,7 +136,7 @@ private:
                         color = sf::Color::Black;
                     } else {
                         auto&& cell = area_->getCell(x, y);
-                        auto&& cr = cell.getCrature();
+                        auto&& cr = cell.creature();
                         if (cr.isAlive()) {
                             color = creatureColors_.at(cr.id());
                         } else {
@@ -153,15 +156,15 @@ private:
     void giveAreasForTwoPlayers_() {
         std::pair<int, int> ul1 = {0, 0};
         std::pair<int, int> lr1 = {field_->width() / 2 - 1, 
-                                        field_->hieght() - 1};
+                                        field_->height() - 1};
         auto area1 = areaFactory_->createArea(field_, ul1, lr1);
-        players_[0]->setArea(std::move(area1));
+        players_[0]->setFieldArea(std::move(area1));
         
         std::pair<int, int> ul2 = {field_->width() / 2, 0};
         std::pair<int, int> lr2 = {field_->width() - 1, 
-                                        field_->hieght() - 1};
+                                        field_->height() - 1};
         auto area2 = areaFactory_->createArea(field_, ul2, lr2);
-        players_[1]->setArea(std::move(area2));
+        players_[1]->setFieldArea(std::move(area2));
 
     }
 
@@ -182,9 +185,10 @@ private:
         setupPhase_ = true;
         auto p = players_[player];
         auto&& area = p->fieldArea();
+        auto a = typeid(area).name();
         curN_ = N;
         area.unlock();
-        while (curN_) {
+        while (curN_ && !askedClose_ && !askedRestart_) {
             notifyAboutPlayerParticipation_(player, curN_);
             input_->readInput();
         } 
@@ -193,8 +197,8 @@ private:
     }
 
     void computeModel_(int T) {
-        while (T--) { 
-            auto [suc, crId] = model_->compute() 
+        while (T-- && !askedClose_ && !askedRestart_) { 
+            auto [suc, crId] = model_->compute();
             if (!suc) {
                 if (crId == -1) {
                     noitfyAboutDraw_();
@@ -207,8 +211,16 @@ private:
                     }
                 }  
                 winnerDeterminate_ = true;
+                break;
             }   
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(250));
         }
+    }
+
+    void restartController_() {
+        field_->clear();
+        updateGridCanvasInView_();
     }
 
     void notifyAboutWinner_(int player) {
@@ -241,16 +253,16 @@ private:
         setTextOnTextComp_(ss.str());
     }
 
-    void setTextOnTextComp_(const std::string& text) {
+    void setTextOnTextComp_(const std::string& txt) {
         auto comp = view_->getComponent("text");
         if (!comp) {
             throw std::logic_error(
                 "The view is missing the text component");
         }
         if (auto text = 
-            std::dynamic_pointer_cast<DrawableText>())
+            std::dynamic_pointer_cast<view::DrawableText>(comp))
         {   
-            text->setText(text);
+            text->setText(txt);
             redrawWindowNDisplay_();
         } else {
             throw std::logic_error(

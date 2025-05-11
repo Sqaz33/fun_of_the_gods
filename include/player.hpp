@@ -28,7 +28,7 @@ public:
            creature_t playerCreature) : 
         area_(std::move(area))
         , creature_(playerCreature)
-    {}
+    { creature_.revive(); }
 
     Player() = default;
     
@@ -48,24 +48,30 @@ public:
 
 public:
     void attach(
-        std::shared_ptr<observer::IObserver> obs, int event_t)
+        std::shared_ptr<observer::IObserver> obs, int event_t) override
     { ISubject::attach(obs, event_t); }
 
     void detach(
-        std::weak_ptr<observer::IObserver> obs, int event_t) 
+        std::weak_ptr<observer::IObserver> obs, int event_t) override
     { ISubject::detach(obs, event_t); }
     
+
+private:
+    void notify(int event_t, std::weak_ptr<ISubject> slf) override {
+        ISubject::notify(event_t, slf);
+    }
+
 public:
     const creature_t& creature() const noexcept {
-        return creature;
+        return creature_;
     }
 
     void setCreature(const creature_t& cr) {
         creature_ = cr;
+        creature_.revive();
     }
     
-    
-    decltype(auto) fieldArea() {
+    auto& fieldArea() {
         return *area_;
     }
 
@@ -78,21 +84,22 @@ public:
 private:
     void setOneCell_(int x, int y) {
         if (area_->isCellAvailable(x, y)) {
-            auto&& cell = area_->getCell();
+            auto&& cell = area_->getCell(x, y);
             auto&& cr = cell.creature();
             if (cr.isAlive() && cr.id() == creature_.id()) {
                 cr.kill();
                 firePlayerKillCreature_();
             } else {
                 cell.setCreature(creature_); 
+                area_->setCell(x, y, cell);
             }
         }
     }
 
     void firePlayerKillCreature_() {
-        notify(
-            game_event::event_t::PLAYER_KILL_CREATURE, 
-            slf());
+        int evt = static_cast<int>(
+            game_event::event_t::PLAYER_KILL_CREATURE);
+        notify(evt, slf());
     }
 
 private:   

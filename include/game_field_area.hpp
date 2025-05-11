@@ -1,6 +1,7 @@
 #ifndef GAME_FIELD_AREA_HPP
 #define GAME_FIELD_AREA_HPP
 
+#include <iostream>
 #include "game_field.hpp"
 
 namespace game_field_area {
@@ -28,7 +29,6 @@ struct IGameFieldArea {
     }
     virtual int width() const noexcept = 0;
     virtual int height() const noexcept = 0;
-
     virtual ~IGameFieldArea() {} 
 
 protected:
@@ -38,12 +38,12 @@ protected:
 
 template <class cell_t>
 bool IGameFieldArea<cell_t>::isCellAvailable(
-    int xidx, int yidx) const noexcept 
+    int xidx, int yidx) const noexcept    
 {
     return xidx >= upperLeftCorner_.first && 
            xidx <= lowerRightCorner_.first &&
-           yidx <= upperLeftCorner_.second &&
-           yidx >= lowerRightCorner_.first;
+           yidx >= upperLeftCorner_.second &&
+           yidx <= lowerRightCorner_.second;
 }
 
 template <class cell_t>
@@ -54,18 +54,12 @@ class GameFieldExcludedCellsArea :
     using base_t = IGameFieldArea<cell_t>;
 public:
     GameFieldExcludedCellsArea(
-            std::shared_ptr<GameFieldExcludedCells> field,
-            std::pair<int, int> upperLeftCorner, 
-            std::pair<int, int> lowerRightCorner) :
-            base_t(upperLeftCorner, lowerRightCorner)
+        std::shared_ptr<GameFieldExcludedCells> field,
+        std::pair<int, int> upperLeftCorner, 
+        std::pair<int, int> lowerRightCorner) :
+        base_t(upperLeftCorner, lowerRightCorner)
     {
-        if (!std::dynamic_pointer_cast<
-            game_field::GameFieldExcludedCells>(field))
-        {
-            throw std::logic_error(
-                "The field should actually be an GameFieldExcludedCells<cell_t>");
-        } 
-        field_ = field_;
+        field_ = field;
     }
 
 public:
@@ -106,19 +100,19 @@ public:
 
     int height() const noexcept override {
         return base_t::upperLeftCorner_.second 
-                - base_t::lowerRightCorner.second
+                - base_t::lowerRightCorner_.second
                 - 1;
     }
 
 private:
-    void verifyThenThrowCellPos_(int xidx, int yidx) {
+    void verifyThenThrowCellPos_(int xidx, int yidx) const {
         if (!isCellAvailable(xidx, yidx)) {
             throw std::logic_error("Accessing a forbidden cell.");
         }
     }
 
 private:
-    bool isLocked_ = false; 
+    bool isLocked_ = true; 
     std::shared_ptr<GameFieldExcludedCells> field_;
 };
 

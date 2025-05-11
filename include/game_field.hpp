@@ -40,12 +40,13 @@ public:
             const std::vector<std::pair<int, int>>& excludedCells) :
         field_(height, std::vector<cell_t>(width, init))
         , excludedCells_(excludedCells.begin(), excludedCells.end())
+        , init_(init)
     {}
     
 public:
     void setCell(int xidx, int yidx, const cell_t& cell) override {
         verifyThenThrowCellPos_(xidx, yidx);
-        field_.at(yidx).at(yidx) = cell;
+        field_.at(yidx).at(xidx) = cell;
         fireGameFieldUpdate_();
     }
 
@@ -56,11 +57,12 @@ public:
 
     cell_t& getCell(int xidx, int yidx) override {
         verifyThenThrowCellPos_(xidx, yidx);
-        return field_.at(yidx).at(yidx);
+        return field_.at(yidx).at(xidx);
     }
 
     void clear() override {
-        field_.clear();
+        field_ = decltype(field_)
+                    (height(), std::vector<cell_t>(width(), init_));
     }
 
     int width() const noexcept override {
@@ -93,7 +95,7 @@ protected:
     }
 
 private:
-    void verifyThenThrowCellPos_(int xidx, int yidx) {
+    void verifyThenThrowCellPos_(int xidx, int yidx) const {
         if (isExludedCell(xidx, yidx)) {
             throw std::logic_error("Accessing a forbidden cell.");
         }
@@ -108,6 +110,7 @@ private:
 private:
     std::vector<std::vector<cell_t>> field_;
     std::set<std::pair<int, int>> excludedCells_;
+    cell_t init_;
 };
 
 } // namespace game_field
