@@ -1,5 +1,6 @@
 #include "user_input.hpp"
 
+#include <iostream>
 #include <cmath>
 
 #include "game_event.hpp"
@@ -22,26 +23,21 @@ UserInput::UserInput(
 {}
 
 void UserInput::readInput() {
-    while (true) {
-        if (auto evt = window_->pollEvent()) {
-            if (evt->is<sf::Event::Closed>()) {
-                fireUserAskedClose_();
-                return;
-            } else if (
-                auto mouse = evt->getIf<sf::Event::MouseButtonPressed>(); 
-                mouse && mouse->button == sf::Mouse::Button::Left) 
-            {   
-                auto pos = mouse->position;
-                computeCoord_(pos.x, pos.y);
-                fireUserAskedSetCreature_();
-                return;
-            } else if (
-                auto key = evt->getIf<sf::Event::KeyPressed>(); 
-                key && key->scancode == sf::Keyboard::Scancode::Escape) 
-            {
-                fireUserAskedRestart_();
-                return;
-            }
+    while (auto evt = window_->pollEvent()) {
+        if (evt->is<sf::Event::Closed>()) {
+            fireUserAskedClose_();
+        } else if (
+            auto mouse = evt->getIf<sf::Event::MouseButtonPressed>(); 
+            mouse && mouse->button == sf::Mouse::Button::Left) 
+        {   
+            auto pos = mouse->position;
+            computeCoord_(pos.x, pos.y);
+            fireUserAskedSetCreature_();
+        } else if (
+            auto key = evt->getIf<sf::Event::KeyPressed>(); 
+            key && key->scancode == sf::Keyboard::Scancode::Escape) 
+        {
+            fireUserAskedRestart_();
         }
     }
 }
@@ -51,24 +47,16 @@ std::tuple<bool, int, int> UserInput::lastCoordInput() noexcept {
 }
 
 void UserInput::computeCoord_(int x, int y) {
-    decltype(lastCoordInput_) res;
-    if (x >= startX_ && y >= startY_) {
-        x -= startX_; 
-        y -= startY_;
-        int cellNGridWidth = 
-            cellWidth_ + gridThickness_;
-        int cellNGridHeight = 
-            cellHeight_ + gridThickness_;
-        int z = y / cellNGridWidth;
-        res = {
-            true,
-            x / cellNGridHeight,
-            y / cellNGridWidth,
-        };
+    int col = static_cast<int>(
+        (x - startX_) / (cellWidth_ + gridThickness_));
+    int row = static_cast<int>(
+        (y - startY_) / (cellHeight_ + gridThickness_));
+
+    if (col >= 0 && row >= 0) {
+        lastCoordInput_ = {true, col, row};
     } else {
-        res = {false, 0, 0};
+        lastCoordInput_ = {false, 0, 0};
     }
-    lastCoordInput_ = res;
 }
 
 std::shared_ptr<UserInput> UserInput::slf() {

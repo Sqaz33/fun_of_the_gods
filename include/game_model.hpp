@@ -29,7 +29,7 @@ private:
     std::map<int, int> countNeighbors_(int xidx, int yidx) const;
     void computeAside_();
     void applyNClearAside_();
-    std::map<int, int> countCreatureInArea_();
+    std::map<int, bool> countAliveCreatureInArea_();
 
 private:
     std::unique_ptr<IGameFieldArea> area_;

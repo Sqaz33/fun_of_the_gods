@@ -11,7 +11,7 @@ namespace {
     using IGameFieldArea = game_field_area::IGameFieldArea<Cell>;
 
     bool computeLiveStatusConwayGame(bool isAlive, int neighborsCount) {
-        return (neighborsCount > 2 && isAlive) || neighborsCount == 3;
+        return (neighborsCount == 2 && isAlive) || neighborsCount == 3;
     }
 } // namespace 
 
@@ -26,7 +26,7 @@ GameModel::GameModel(
 std::pair<bool, int> GameModel::compute() {
     computeAside_();
     applyNClearAside_();
-    auto count = countCreatureInArea_();
+    auto count = countAliveCreatureInArea_();
     if (count.size() < 2) {
         if (count.size() == 1) {
             return {false, count.begin()->first};
@@ -66,7 +66,7 @@ std::map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
 }
 
 void GameModel::computeAside_() {
-    auto corner = area_->getUpperLeftCorner();
+    auto corner = area_->upperLeftCorner();
     auto limW = area_->width() + corner.first;
     auto limH = area_->height() + corner.second;
     for (auto y = corner.second; y < limH; ++y) {
@@ -86,7 +86,7 @@ void GameModel::computeAside_() {
                         int id = max->first;
                         aside_.emplace_back(id, true, x, y);
                     }
-                } else {
+                } else if (isAlive) {
                     aside_.emplace_back(0, false, x, y);
                 }
             }
@@ -105,13 +105,14 @@ void GameModel::applyNClearAside_() {
         } else {
             cr.kill(); 
         }
+        area_->setCell(x, y, cr);
     }
     aside_.clear();
 }
 
-std::map<int, int> GameModel::countCreatureInArea_() {
-    std::map<int, int> res;
-    auto corner = area_->getUpperLeftCorner();
+std::map<int, bool> GameModel::countAliveCreatureInArea_() {
+    std::map<int, bool> res;
+    auto corner = area_->upperLeftCorner();
     auto limW = area_->width() + corner.first;
     auto limH = area_->height() + corner.second;
     for (auto y = corner.second; y < limH; ++y) {
@@ -119,11 +120,8 @@ std::map<int, int> GameModel::countCreatureInArea_() {
             if (area_->isCellAvailable(x, y)) {
                 auto&& cell = area_->getCell(x, y);
                 auto&& cr = cell.creature();
-                auto it = res.find(cr.id());
-                if (it != res.end()) {
-                    ++it->second;
-                } else {
-                    res[cr.id()] = 0;
+                if (cr.isAlive()) {
+                    res[cr.id()] = true;
                 }
             }
         }

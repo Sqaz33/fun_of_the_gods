@@ -76,7 +76,9 @@ public:
                 break;
             }
             case evt_t::GAME_FIELD_UPDATE: {
-                updateGridCanvasInView_();
+                if (setupPhase_) {
+                    updateGridCanvasInView_();
+                }
                 if (setupPhase_) {
                     --curN_;
                 }
@@ -100,8 +102,8 @@ public:
             askedRestart_ = false;
             setupField_(K_);
             while ((!askedRestart_) && (!winnerDeterminate_) && (!askedClose_)) {    
-                setupField_(N_);
                 computeModel_(T_);
+                if (!winnerDeterminate_) setupField_(N_);
             }
             winnerDeterminate_ = false;
             while ((!askedRestart_) && (!askedClose_)) {
@@ -157,6 +159,7 @@ private:
         std::pair<int, int> ul1 = {0, 0};
         std::pair<int, int> lr1 = {field_->width() / 2 - 1, 
                                         field_->height() - 1};
+        // auto lr1 = area_->
         auto area1 = areaFactory_->createArea(field_, ul1, lr1);
         players_[0]->setFieldArea(std::move(area1));
         
@@ -198,7 +201,9 @@ private:
 
     void computeModel_(int T) {
         while (T-- && !askedClose_ && !askedRestart_) { 
+            notifyAboutModelComputing_(T);
             auto [suc, crId] = model_->compute();
+            updateGridCanvasInView_();
             if (!suc) {
                 if (crId == -1) {
                     noitfyAboutDraw_();

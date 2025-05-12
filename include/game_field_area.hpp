@@ -21,10 +21,10 @@ struct IGameFieldArea {
     virtual void setCell(int xidx, int yidx, const cell_t& cell) = 0;
     virtual const cell_t& getCell(int xidx, int yidx) const = 0;
     virtual cell_t& getCell(int xidx, int yidx) = 0;
-    virtual std::pair<int, int> getUpperLeftCorner() const noexcept {
+    virtual std::pair<int, int> upperLeftCorner() const noexcept {
         return upperLeftCorner_; 
     }
-    virtual std::pair<int, int> getLowerRightCorner() const noexcept {
+    virtual std::pair<int, int> lowerRightCorner() const noexcept {
         return lowerRightCorner_;
     }
     virtual int width() const noexcept = 0;
@@ -95,13 +95,13 @@ public:
     int width() const noexcept override {
         return base_t::lowerRightCorner_.first 
                 - base_t::upperLeftCorner_.first
-                - 1;
+                + 1;
     }
 
     int height() const noexcept override {
-        return base_t::upperLeftCorner_.second 
-                - base_t::lowerRightCorner_.second
-                - 1;
+        return base_t::lowerRightCorner_.second
+               - base_t::upperLeftCorner_.second 
+               + 1;
     }
 
 private:

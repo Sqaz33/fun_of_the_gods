@@ -81,8 +81,8 @@ int main() {
     auto window = std::make_shared<sf::RenderWindow>(
             sf::VideoMode({windowSz.first, windowSz.second}), "Fun Of The Gods");
     
-    float startX = frameThickness + gridThickness;
-    float startY = frameThickness + gridThickness;
+    float startX = frameThickness;
+    float startY = frameThickness;
     auto input = std::make_shared<UserInput>(
         window, startX, 
         startY, gridCellWidth, 
@@ -95,6 +95,7 @@ int main() {
         
     auto modelArea = 
         std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
+    modelArea->unlock();
     auto model = std::make_unique<GameModel>(std::move(modelArea), 2);
 
     std::vector<std::shared_ptr<Player>> players(2);
