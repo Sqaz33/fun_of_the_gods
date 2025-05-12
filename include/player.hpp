@@ -71,7 +71,7 @@ public:
         creature_.revive();
     }
     
-    auto& fieldArea() {
+    decltype(auto) fieldArea() {
         return *area_;
     }
 

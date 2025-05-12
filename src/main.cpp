@@ -71,7 +71,7 @@ int main() {
     nestedL->addComponent(grid, "grid_canvas");
 
     auto text = std::make_shared<DrawableText>(
-        "", 40, "calibri.ttf", sf::Color::Black, sf::Vector2f(250, 0.f));
+        "dummy", 40, "calibri.ttf", sf::Color::Black, sf::Vector2f(250, 0.f));
 
     auto stackL = std::make_shared<DrawableStackLayout>();
     stackL->addComponent(text, "text");

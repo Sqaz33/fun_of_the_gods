@@ -159,7 +159,6 @@ private:
         std::pair<int, int> ul1 = {0, 0};
         std::pair<int, int> lr1 = {field_->width() / 2 - 1, 
                                         field_->height() - 1};
-        // auto lr1 = area_->
         auto area1 = areaFactory_->createArea(field_, ul1, lr1);
         players_[0]->setFieldArea(std::move(area1));
         

@@ -9,11 +9,11 @@ namespace user_input {
 
 UserInput::UserInput(       
         std::shared_ptr<sf::Window> window, 
-        float startX, 
-        float startY,
-        float cellWidth,
-        float cellHeight,
-        float gridThickness):
+        int startX, 
+        int startY,
+        int cellWidth,
+        int cellHeight,
+        int gridThickness):
     window_(window)
     , startX_(startX)
     , startY_(startY)
@@ -47,10 +47,10 @@ std::tuple<bool, int, int> UserInput::lastCoordInput() noexcept {
 }
 
 void UserInput::computeCoord_(int x, int y) {
-    int col = static_cast<int>(
-        (x - startX_) / (cellWidth_ + gridThickness_));
-    int row = static_cast<int>(
-        (y - startY_) / (cellHeight_ + gridThickness_));
+    int col = 
+        (x - startX_) / (cellWidth_ + gridThickness_);
+    int row = 
+        (y - startY_) / (cellHeight_ + gridThickness_);
 
     if (col >= 0 && row >= 0) {
         lastCoordInput_ = {true, col, row};
