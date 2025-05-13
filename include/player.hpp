@@ -89,7 +89,7 @@ private:
             if (cr.isAlive() && cr.id() == creature_.id()) {
                 cr.kill();
                 firePlayerKillCreature_();
-            } else {
+            } else if (!cr.isAlive()) {
                 cell.setCreature(creature_); 
                 area_->setCell(x, y, cell);
             }

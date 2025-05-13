@@ -4,6 +4,7 @@
 #include <numeric>
 #include <array>
 #include <tuple>
+#include <iterator>
 
 namespace {
     using Creature = creature::Creature;
@@ -13,6 +14,18 @@ namespace {
     bool computeLiveStatusConwayGame(bool isAlive, int neighborsCount) {
         return (neighborsCount == 2 && isAlive) || neighborsCount == 3;
     }
+
+    // template <class It>
+    // using value_t = typename std::iterator_traits<It>::value_type;
+    
+    // template <class It, class Pred>
+    // std::vector<value_t<It>> allMaxes(It first, It end, const value_t<It>& min, Pred pred) {
+    //     value_t<It> res;
+    //     auto max = min;
+    //     for (; first != end; ++first) {
+    //         if (pred)
+    //     }
+    // }
 } // namespace 
 
 namespace game_model {
