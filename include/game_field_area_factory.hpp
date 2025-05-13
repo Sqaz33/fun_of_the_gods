@@ -7,42 +7,25 @@
 
 namespace factory {
 
-template <class cell_t>
 struct IGameFieldAreaFactory {
     virtual
-        std::unique_ptr<game_field_area::IGameFieldArea<cell_t>>
+        std::unique_ptr<game_field_area::IGameFieldArea>
     createArea(
-        std::shared_ptr<game_field::IGameField<cell_t>> field,
+        std::shared_ptr<game_field::IGameField> field,
         std::pair<int, int> upperLeftCorner, 
         std::pair<int, int> lowerRightCorner) const = 0;
     virtual ~IGameFieldAreaFactory() {} 
 };
 
-template <class cell_t>
 class GameFieldExcludedCellsAreaFactory : 
-    public IGameFieldAreaFactory<cell_t>  
+public IGameFieldAreaFactory
 {
 public:
-        std::unique_ptr<game_field_area::IGameFieldArea<cell_t>>
+    std::unique_ptr<game_field_area::IGameFieldArea>
     createArea(
-        std::shared_ptr<game_field::IGameField<cell_t>> field,
+        std::shared_ptr<game_field::IGameField> field,
         std::pair<int, int> upperLeftCorner, 
-        std::pair<int, int> lowerRightCorner) const override
-    {       
-        if (auto f = std::dynamic_pointer_cast<
-                game_field::GameFieldExcludedCells<cell_t>>(field); !f)
-        {
-            throw std::logic_error(
-                "The field should actually be an GameFieldExcludedCells<cell_t>");
-        } else {
-            return std::make_unique<
-                game_field_area::GameFieldExcludedCellsArea<cell_t>>(
-                    f,
-                    upperLeftCorner,
-                    lowerRightCorner);
-        }
-
-    }
+        std::pair<int, int> lowerRightCorner) const override;
 };
 
 } // namespace factory

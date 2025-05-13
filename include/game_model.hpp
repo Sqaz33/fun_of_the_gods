@@ -5,8 +5,7 @@
 #include <utility>
 #include <map>
 
-#include "creature.hpp"
-#include "cell.hpp"
+#include "creature_factory.hpp"
 #include "game_field_area.hpp"
 
 namespace game_model {
@@ -17,9 +16,7 @@ struct IGameModel {
 };
 
 class GameModel : public IGameModel {
-    using Creature = creature::Creature;
-    using Cell = cell::Cell<Creature>;
-    using IGameFieldArea = game_field_area::IGameFieldArea<Cell>;
+    using IGameFieldArea = game_field_area::IGameFieldArea;
 
 public:
     GameModel(std::unique_ptr<IGameFieldArea> area, int playerCount);    

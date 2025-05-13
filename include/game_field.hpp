@@ -4,122 +4,82 @@
 #include <set>
 #include <vector>
 #include <utility>
-#include <tuple>
 #include <stdexcept>
 
+#include "cell.hpp"
 #include "game_event.hpp"
 #include "subject.hpp"
+#include "creature_factory.hpp" 
 
-// declarations
+
 namespace game_field {
 
-template <class cell_t> 
-struct IGameField : public subject::ISubject {
-    virtual void setCell(int xidx, int yidx, const cell_t& cell) = 0;
-    virtual const cell_t& getCell(int xidx, int yidx) const = 0; 
-    virtual cell_t& getCell(int xidx, int yidx) = 0; 
+struct IGameField  {
+    virtual const creature::ICreature& getCreatureByCell(int xidx, int yidx) const = 0; 
+    virtual void reviveCreatureInCell(int xidx, int yidx, int id) = 0;
+    virtual void killCreatureInCell(int xidx, int yidx) = 0;
+    virtual void clearCell(int xidx, int yidx) = 0;
     virtual void clear() = 0;
+    virtual std::pair<int, int> lastAffectedCell() const noexcept = 0;
     virtual int width() const noexcept = 0;
     virtual int height() const noexcept = 0;
     virtual ~IGameField() {}
 };
 
-template <class cell_t> 
 class GameFieldExcludedCells :
-    public IGameField<cell_t>
-    , public std::enable_shared_from_this<
-                        GameFieldExcludedCells<cell_t>>
+    public IGameField
+    , public std::enable_shared_from_this<GameFieldExcludedCells>
+    , public subject::ISubject
 {
 private:
     using ISubject = subject::ISubject;
-    using sh_base_t = std::enable_shared_from_this<
-                                GameFieldExcludedCells<cell_t>>;
+    using ICreatureFactory = factory::ICreatureFactory;
 
 public:
-    GameFieldExcludedCells(int width, int height, const cell_t& init,
-            const std::vector<std::pair<int, int>>& excludedCells) :
-        field_(height, std::vector<cell_t>(width, init))
-        , excludedCells_(excludedCells.begin(), excludedCells.end())
-        , init_(init)
-    {}
+    GameFieldExcludedCells(
+        int width, int height, 
+        const std::vector<std::pair<int, int>>& excludedCells,
+        std::unique_ptr<factory::ICreatureFactory> creatFactory);
     
 public:
-    void setCell(int xidx, int yidx, const cell_t& cell) override {
-        verifyThenThrowCellPos_(xidx, yidx);
-        field_.at(yidx).at(xidx) = cell;
-        fireGameFieldUpdate_();
-    }
-
-    const cell_t& getCell(int xidx, int yidx) const override {
-        verifyThenThrowCellPos_(xidx, yidx);
-        return field_.at(yidx).at(yidx);
-    }
-
-    cell_t& getCell(int xidx, int yidx) override {
-        verifyThenThrowCellPos_(xidx, yidx);
-        return field_.at(yidx).at(xidx);
-    }
-
-    void clear() override {
-        field_ = decltype(field_)
-                    (height(), std::vector<cell_t>(width(), init_));
-    }
-
-    int width() const noexcept override {
-        return field_.back().size();
-    }
-
-    int height() const noexcept override {
-        return field_.size();
-    }
+    const creature::ICreature& getCreatureByCell(int xidx, int yidx) const;
+    void reviveCreatureInCell(int xidx, int yidx, int id);
+    void killCreatureInCell(int xidx, int yidx);
+    void clearCell(int xidx, int yidx);
+    void clear();
+    std::pair<int, int> lastAffectedCell() const noexcept;
+    int width() const noexcept;
+    int height() const noexcept;
 
 public:
-    bool isExludedCell(int xidx, int yidx) const {
-        return excludedCells_.contains({xidx, yidx});
-    }
-
-    auto slf() { return sh_base_t::shared_from_this(); }
+    bool isExludedCell(int xidx, int yidx) const;
+    std::shared_ptr<GameFieldExcludedCells> slf();
 
 public:
     void attach(
-        std::shared_ptr<observer::IObserver> obs, int event_t) override
-    { ISubject::attach(obs, event_t); }
+        std::shared_ptr<observer::IObserver> obs, int event_t) override;
 
     void detach(
-        std::weak_ptr<observer::IObserver> obs, int event_t) override
-    { ISubject::detach(obs, event_t); }
+        std::weak_ptr<observer::IObserver> obs, int event_t) override;
 
 protected:
-    void notify(int event_t, std::weak_ptr<ISubject> slf) override {
-        ISubject::notify(event_t, slf);
-    }
+    void notify(int event_t, std::weak_ptr<ISubject> slf) override;
 
 private:
-    void verifyThenThrowCellPos_(int xidx, int yidx) const {
-        if (isExludedCell(xidx, yidx)) {
-            throw std::logic_error("Accessing a forbidden cell.");
-        }
-    }
-
-    void fireGameFieldUpdate_() {
-        notify(static_cast<int>(
-                game_event::event_t::GAME_FIELD_UPDATE), 
-               slf());
-    }
-
+    void verifyThenThrowCellPos_(int xidx, int yidx) const;
+    void fireFieldClear_();
+    void fireCellClear_();
+    void fireCreatureRevive_();
+    void fireCreatureKill_();
+    void prepareField_();
+    
 private:
-    std::vector<std::vector<cell_t>> field_;
+    std::vector<std::vector<cell::Cell>> field_;
     std::set<std::pair<int, int>> excludedCells_;
-    cell_t init_;
+    std::pair<int, int> lastAffectedCell_ = {-1, -1};
+    std::unique_ptr<factory::ICreatureFactory> creatFactory_;
 };
 
 } // namespace game_field
 
-
-// TODO: definitions 
-namespace game_field {
-
-} // namespace game_field
-
-
-#endif // GAME_FIELD_HPPч
+#endif // GAME_FIELD_HPP

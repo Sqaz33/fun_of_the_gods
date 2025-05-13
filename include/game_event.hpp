@@ -6,11 +6,13 @@ namespace game_event {
 enum class event_t : int;
 
 enum class event_t : int {
-    GAME_FIELD_UPDATE = 0,
+    FIELD_CLEAR = 0,
+    CELL_CLEAR_IN_FIELD,
+    CREATURE_KILL_IN_FIELD,
+    CREATURE_REVIVE_IN_FIELD,
     USER_ASKED_CLOSE,
     USER_ASKED_RESTART,
     USER_ASKED_SET_CREATURE,
-    PLAYER_KILL_CREATURE
 };
 
 } // game_event 

@@ -1,33 +1,25 @@
 #ifndef CELL_HPP
 #define CELL_HPP
 
+#include <memory>
+
+#include "creature.hpp"
+
 namespace cell {
 
-template <class creature_t>
 struct ICell {
-    virtual creature_t& creature() noexcept = 0;
-    virtual void setCreature(const creature_t& creat) = 0;
+    virtual creature::ICreature& creature() noexcept = 0;
+    virtual void setCreature(std::unique_ptr<creature::ICreature> creat) = 0;
     virtual ~ICell() {}
 }; 
 
-template <class creature_t>
-class Cell : public ICell<creature_t> {
+class Cell : public ICell {
 public:
-    Cell(const creature_t& init) :
-        creature_(init)
-    {}
-
-public:
-    creature_t& creature() noexcept override {
-        return creature_;
-    }
-
-    void setCreature(const creature_t& cr) override{
-        creature_ = cr;
-    }
+    creature::ICreature& creature() noexcept override;
+    void setCreature(std::unique_ptr<creature::ICreature> creat) override;
 
 private:
-    creature_t creature_;
+    std::unique_ptr<creature::ICreature> creat_;
 };
 
 } // namespace cell
