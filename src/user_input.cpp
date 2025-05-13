@@ -9,11 +9,11 @@ namespace user_input {
 
 UserInput::UserInput(       
         std::shared_ptr<sf::Window> window, 
-        int startX, 
-        int startY,
-        int cellWidth,
-        int cellHeight,
-        int gridThickness):
+        float startX, 
+        float startY,
+        float cellWidth,
+        float cellHeight,
+        float gridThickness):
     window_(window)
     , startX_(startX)
     , startY_(startY)

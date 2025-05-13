@@ -23,11 +23,11 @@ class UserInput :
 public:
     UserInput(
         std::shared_ptr<sf::Window> window, 
-        int startX, 
-        int startY,
-        int cellWidth,
-        int cellHeight,
-        int gridThickness);
+        float startX, 
+        float startY,
+        float cellWidth,
+        float cellHeight,
+        float gridThickness);
 
 public:
     void readInput() override;
@@ -58,11 +58,11 @@ private:
 
 private:
     std::shared_ptr<sf::Window> window_;
-    int startX_;
-    int startY_;
-    int cellWidth_;
-    int cellHeight_;
-    int gridThickness_;
+    float startX_;
+    float startY_;
+    float cellWidth_;
+    float cellHeight_;
+    float gridThickness_;
     std::tuple<bool, int, int>  lastCoordInput_ = {false, 0, 0};
 }; 
 

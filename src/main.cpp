@@ -28,6 +28,8 @@ int main() {
     using Player = Player<creature::Creature, cell::Cell>;
     using GameController = GameController<creature::Creature, cell::Cell>;
 
+    constexpr float k = 0.8f;
+
     // game config //
     ///////////////////////////
     const int fieldWidth = 50;
@@ -37,10 +39,10 @@ int main() {
 
     // view config //
     ///////////////////////////
-    const float gridThickness = 2;             
-    const float gridCellWidth = 20;
-    const float gridCellHieght = 20;
-    const float frameThickness = 5;
+    const float gridThickness = 2 * k;             
+    const float gridCellWidth = 20 * k;
+    const float gridCellHieght = 20 * k;
+    const float frameThickness = 5 * k;
     ///////////////////////////
 
 
@@ -71,7 +73,7 @@ int main() {
     nestedL->addComponent(grid, "grid_canvas");
 
     auto text = std::make_shared<DrawableText>(
-        "dummy", 40, "calibri.ttf", sf::Color::Black, sf::Vector2f(250, 0.f));
+        "dummy", 40 * k, "calibri.ttf", sf::Color::Black, sf::Vector2f(250 * k, 0.f));
 
     auto stackL = std::make_shared<DrawableStackLayout>();
     stackL->addComponent(text, "text");
