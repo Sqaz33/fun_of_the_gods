@@ -19,9 +19,9 @@ class GameController : public observer::IObserver {
     using IGameFieldArea = game_field_area::IGameFieldArea;
     using IGameModel = game_model::IGameModel;
     using IUserInput = user_input::IUserInput;
-    using IGameFieldAreaFactory = 
-        factory::IGameFieldAreaFactory;
-    using IGameFieldArea = game_field_area::IGameFieldArea;
+    using IGameFieldAreaCurryFactory = 
+        factory::IGameFieldAreaCurryFactory;
+    using DrawableGridCanvas = view::DrawableGridCanvas;
 
 public:
     GameController(
@@ -29,7 +29,7 @@ public:
             int T,
             int N,
             std::unique_ptr<IGameFieldArea> area,
-            std::unique_ptr<IGameFieldAreaFactory> areaFactory,
+            std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory,
             std::unique_ptr<IGameModel> model,
             std::shared_ptr<view::IDrawableComposite> view,
             const std::vector<std::shared_ptr<player::Player>>& players,
@@ -46,9 +46,11 @@ public:
 
 private:
     void redrawWindowNDisplay_();
-    void updateGridCanvasInView_();
+    void updateCellInGridCanvasInView_(int xidx, int yidx);
+    std::shared_ptr<DrawableGridCanvas> getCanvasComp_();
+    void clearGridCanvas_();
     void giveAreasForTwoPlayers_();
-    void giveCreaturePlayers_();
+    void giveCreatureIdPlayers_();
     void setupField_(int N);
     void setupFieldForPlayer_(int N, int player);
     void computeModel_(int T);
@@ -61,7 +63,7 @@ private:
 
 private:
     std::unique_ptr<IGameFieldArea> area_;
-    std::unique_ptr<IGameFieldAreaFactory> areaFactory_;
+    std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory_;
     std::unique_ptr<IGameModel> model_;
     std::shared_ptr<view::IDrawableComposite> view_;
     std::vector<std::shared_ptr<player::Player>> players_;

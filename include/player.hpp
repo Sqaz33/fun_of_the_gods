@@ -16,9 +16,11 @@ class Player : public observer::IObserver {
 public:
     void update(
         std::weak_ptr<subject::ISubject> subj, int event_t) override;
-    IGameFieldArea& fieldArea();
  
 public:
+    void setFieldArea(
+        std::unique_ptr<IGameFieldArea> area);
+    IGameFieldArea& fieldArea();
     void setCreatId(int id) noexcept;
     int creatId() const noexcept;
 

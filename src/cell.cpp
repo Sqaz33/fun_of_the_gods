@@ -4,7 +4,11 @@
 
 namespace cell {
     
-creature::ICreature& Cell::creature() noexcept {
+creature::ICreature& Cell::creature() {
+    return *creat_;
+}
+
+const creature::ICreature& Cell::creature() const {
     return *creat_;
 }
 

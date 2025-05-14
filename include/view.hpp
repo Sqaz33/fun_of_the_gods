@@ -153,13 +153,11 @@ private:
                       sf::Color blockColor);
     void drawGrid_(sf::RenderWindow& window, sf::Vector2f start);
 
+
 private:
-    struct cell_t {
-        std::pair<std::size_t, std::size_t> pos;
-        sf::Color color;
-    };
-private:
-    std::vector<cell_t> cells_;
+    std::map<
+        std::pair<std::size_t, std::size_t>, sf::Color> 
+    cells_;
     float gridThickness_;
     std::size_t widthInCells_;
     std::size_t heightInCells_;

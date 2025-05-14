@@ -24,4 +24,9 @@ bool Creature::operator<(const Creature& cr) {
     return id_ < cr.id_;
 }
 
+int nextCreatureId() {
+    static int id = idDead;
+    return ++id;
+}
+
 } // namespace creature

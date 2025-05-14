@@ -1,14 +1,16 @@
 #include "game_field.hpp"
 
 namespace game_field {
+
 GameFieldExcludedCells::GameFieldExcludedCells(
         int width, int height, 
         const std::vector<std::pair<int, int>>& excludedCells,
         std::unique_ptr<factory::ICreatureFactory> creatFactory) :
-    field_(height, std::vector<cell::Cell>(width))
-    , excludedCells_(excludedCells.begin(), excludedCells.end())
+    excludedCells_(excludedCells.begin(), excludedCells.end())
     , creatFactory_(std::move(creatFactory))
-{ prepareField_(); }
+{   initField_(width, height); 
+    prepareField_(); 
+}
 
 void GameFieldExcludedCells::reviveCreatureInCell(
     int xidx, int yidx, int id)
@@ -25,7 +27,7 @@ void GameFieldExcludedCells::killCreatureInCell(
     verifyThenThrowCellPos_(xidx, yidx);
     field_.at(yidx).at(xidx).creature().kill(); 
     lastAffectedCell_ = { xidx, yidx }; 
-    fireCreatureRevive_();
+    fireCreatureKill_();
 }
 
 const creature::ICreature&
@@ -35,8 +37,10 @@ GameFieldExcludedCells::getCreatureByCell(int xidx, int yidx) const {
 }
 
 void GameFieldExcludedCells::clear() {
-    field_ = decltype(field_)
-        (height(), std::vector<cell::Cell>(width()));
+    int w = width();
+    int h = height();
+    field_.clear();
+    initField_(w, h);
     prepareField_();
     fireFieldClear_();
 }
@@ -117,6 +121,17 @@ void GameFieldExcludedCells::prepareField_() {
         for (auto&& cell : row) {
             cell.setCreature(creatFactory_->createCreature());
         }
+    }
+}
+
+void GameFieldExcludedCells::initField_(int width, int height) {
+    field_ = decltype(field_)();
+    for (int i = 0; i < height; ++i) {
+        std::vector<cell::Cell> r;
+        for (int j = 0; j < width; ++j) {
+            r.emplace_back(cell::Cell());
+        }
+        field_.emplace_back(std::move(r));
     }
 }
 

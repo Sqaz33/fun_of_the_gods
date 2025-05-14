@@ -72,6 +72,7 @@ private:
     void fireCreatureRevive_();
     void fireCreatureKill_();
     void prepareField_();
+    void initField_(int width, int height);
     
 private:
     std::vector<std::vector<cell::Cell>> field_;

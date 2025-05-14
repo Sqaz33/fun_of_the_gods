@@ -21,7 +21,7 @@ struct IGameFieldArea {
     virtual const creature::ICreature& 
         getCreatureByCell(int xidx, int yidx) const = 0; 
     virtual void clearCell(int xidx, int yidx) = 0;
-    virtual void clearArea() = 0;
+    virtual void clear() = 0;
     virtual std::pair<int, int> upperLeftCorner() const noexcept = 0;
     virtual std::pair<int, int> lowerRightCorner() const noexcept = 0;
     virtual int width() const noexcept = 0;
@@ -52,7 +52,9 @@ public:
     void killCreatureInCell(int xidx, int yidx) override;
     const ICreature& getCreatureByCell(int xidx, int yidx) const override;
     void clearCell(int xidx, int yidx) override;
-    void clearArea() override;
+    void clear() override;
+    std::pair<int, int> upperLeftCorner() const noexcept override;
+    std::pair<int, int> lowerRightCorner() const noexcept override;
     int width() const noexcept override;
     int height() const noexcept override;
 

@@ -3,7 +3,7 @@
 namespace game_field_area {
 
 bool IGameFieldArea::isCellAvailable(
-    int xidx, int yidx) const noexcept    
+    int xidx, int yidx) const
 {
     return xidx >= upperLeftCorner_.first && 
            xidx <= lowerRightCorner_.first &&
@@ -27,7 +27,7 @@ void GameFieldExcludedCellsArea::unlock() noexcept {
 }
 
 bool GameFieldExcludedCellsArea::isCellAvailable(
-    int xidx, int yidx) const noexcept 
+    int xidx, int yidx) const
 {
     return IGameFieldArea::isCellAvailable(xidx, yidx) && 
            !isLocked_ &&
@@ -61,7 +61,7 @@ void GameFieldExcludedCellsArea::clearCell(int xidx, int yidx)
     field_->clearCell(xidx, yidx);
 }
 
-void GameFieldExcludedCellsArea::clearArea() {
+void GameFieldExcludedCellsArea::clear() {
     if (width() == field_->width() && 
         height() == field_->height()) 
     { 
@@ -80,6 +80,14 @@ void GameFieldExcludedCellsArea::clearArea() {
         }
     }
 }
+
+std::pair<int, int> 
+GameFieldExcludedCellsArea::upperLeftCorner() const noexcept 
+{ return upperLeftCorner_; }
+
+std::pair<int, int> 
+GameFieldExcludedCellsArea::lowerRightCorner() const noexcept 
+{ return lowerRightCorner_; }
 
 int GameFieldExcludedCellsArea::width() const noexcept {
     return lowerRightCorner_.first 

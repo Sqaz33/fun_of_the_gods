@@ -19,15 +19,6 @@ int main() {
     using namespace player;
     using namespace game_event;
     
-    using GameFieldExcludedCells = 
-        GameFieldExcludedCells<cell::Cell<creature::Creature>>;
-    using GameFieldExcludedCellsArea =
-        GameFieldExcludedCellsArea<cell::Cell<creature::Creature>>;
-    using GameFieldExcludedCellsAreaFactory =
-        GameFieldExcludedCellsAreaFactory<cell::Cell<creature::Creature>>;
-    using Player = Player<creature::Creature, cell::Cell>;
-    using GameController = GameController<creature::Creature, cell::Cell>;
-
     constexpr float k = 0.8f;
 
     // game config //
@@ -46,16 +37,26 @@ int main() {
     ///////////////////////////
 
 
-    auto field = std::make_shared<GameFieldExcludedCells >(
-                    fieldWidth, fieldHeight, 
-                    cell::Cell(creature::Creature()), 
-                    std::vector<std::pair<int, int>>()
-                );
 
+    // ###########################################################################
+    auto creatFactory = 
+        std::make_unique<CreatureFactory>();
+
+    auto field = std::make_shared<GameFieldExcludedCells>(
+                    fieldWidth, fieldHeight, 
+                    std::vector<std::pair<int, int>>(),
+                    std::move(creatFactory)
+                );
+    // ###########################################################################
+
+
+
+    // ###########################################################################
     float gridWidth = gridCellWidth * field->width() 
                       + gridThickness * (field->width() + 1);
     float gridHeight = gridCellHieght * field->height()
                        + gridThickness * (field->height() + 1);
+
     auto grid = std::make_shared<DrawableGridCanvas>(
         gridWidth, gridHeight, 
         field->width(), field->height(), 
@@ -82,15 +83,22 @@ int main() {
     std::pair<unsigned, unsigned> windowSz = stackL->size();
     auto window = std::make_shared<sf::RenderWindow>(
             sf::VideoMode({windowSz.first, windowSz.second}), "Fun Of The Gods");
-    
+    // ###########################################################################
+
+
+
+    // ###########################################################################
     float startX = frameThickness;
     float startY = frameThickness;
     auto input = std::make_shared<UserInput>(
         window, startX, 
         startY, gridCellWidth, 
         gridCellHieght, gridThickness);
+    // ###########################################################################
 
 
+
+    // ###########################################################################
     std::pair<int, int> ul = {0, 0};
     std::pair<int, int> lr = {field->width() - 1, 
                                     field->height() - 1};
@@ -106,23 +114,35 @@ int main() {
     }
 
     auto areaFactory = 
-        std::make_unique<GameFieldExcludedCellsAreaFactory>();
+        std::make_unique<
+            GameFieldExcludedCellsAreaCurryFactory>(field);
 
     std::unordered_map<int, sf::Color> crColors 
-        { {0, sf::Color::Red}, {1, sf::Color::Blue} };
+        { {-1, sf::Color::White}, {0, sf::Color::Red}, {1, sf::Color::Blue} };
 
+    auto controllerArea = 
+        std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
+    controllerArea->unlock();
+    
     auto controller = std::make_shared<GameController>(
         K, T, N,
-        field, std::move(areaFactory),
+        std::move(controllerArea), std::move(areaFactory),
         std::move(model),  stackL, 
         players, input,
         window, crColors
     );
+    // ###########################################################################
 
     // configuring the subject-observer interaction //
     /////////////////////////////////////////////////////////////////
     field->attach(controller, 
-        static_cast<int>(event_t::GAME_FIELD_UPDATE));
+        static_cast<int>(event_t::FIELD_CLEAR));
+    field->attach(controller, 
+        static_cast<int>(event_t::CELL_CLEAR_IN_FIELD));
+    field->attach(controller, 
+        static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
+    field->attach(controller, 
+        static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
     input->attach(controller, 
         static_cast<int>(event_t::USER_ASKED_RESTART));
     input->attach(controller, 
@@ -130,15 +150,11 @@ int main() {
     for (auto&& p : players) {
         input->attach(p, 
             static_cast<int>(event_t::USER_ASKED_SET_CREATURE));
-        p->attach(controller, 
-            static_cast<int>(event_t::PLAYER_KILL_CREATURE));
     }
     /////////////////////////////////////////////////////////////////
 
     controller->game();
-
     window->close();
-
     return 0;
 }
 // } catch (const std::exception& e) {

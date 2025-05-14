@@ -8,14 +8,16 @@
 namespace cell {
 
 struct ICell {
-    virtual creature::ICreature& creature() noexcept = 0;
+    virtual const creature::ICreature& creature() const = 0;
+    virtual creature::ICreature& creature() = 0;
     virtual void setCreature(std::unique_ptr<creature::ICreature> creat) = 0;
     virtual ~ICell() {}
 }; 
 
 class Cell : public ICell {
 public:
-    creature::ICreature& creature() noexcept override;
+    const creature::ICreature& creature() const override;
+    creature::ICreature& creature() override;
     void setCreature(std::unique_ptr<creature::ICreature> creat) override;
 
 private:

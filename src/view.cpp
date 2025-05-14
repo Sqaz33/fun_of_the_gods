@@ -261,9 +261,8 @@ DrawableGridCanvas::DrawableGridCanvas(float width,
 void DrawableGridCanvas::draw(sf::RenderWindow& window, sf::Vector2f start) {
     drawGrid_(window, start);
     for (const auto& cell : cells_) {
-        auto x = cell.pos.first;
-        auto y = cell.pos.second;
-        drawCellAt_(x, y, start, window, cell.color);
+        auto [x, y] = cell.first;
+        drawCellAt_(x, y, start, window, cell.second);
     }
 }
 
@@ -273,13 +272,12 @@ std::pair<float, float> DrawableGridCanvas::size() const {
 
 void DrawableGridCanvas::paintCell(
     std::pair<std::size_t, std::size_t> pos, sf::Color color) {
-    cells_.emplace_back(pos, color);
+    cells_[pos] = color;
 }
 
 void DrawableGridCanvas::clear() {
     cells_.clear();
 }
-
 
 float DrawableGridCanvas::gridThickness() const noexcept {
     return gridThickness_;

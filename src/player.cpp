@@ -9,7 +9,7 @@ namespace {
 namespace player {
     
 void Player::update(
-    std::weak_ptr<subject::ISubject> subj, int event_t) override
+    std::weak_ptr<subject::ISubject> subj, int event_t) 
 { 
     auto evt = static_cast<game_event::event_t>(event_t);
     if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) {
@@ -21,6 +21,14 @@ void Player::update(
     }
 }
 
+void Player::setFieldArea(
+        std::unique_ptr<IGameFieldArea> area)
+{ area_ = std::move(area); }
+
+IGameFieldArea& Player::fieldArea(){
+    return *area_;
+}
+
 void Player::setCreatId(int id) noexcept {
     creatId_ = id;
 }
@@ -29,17 +37,13 @@ int Player::creatId() const noexcept {
     return creatId_;
 }
 
-IGameFieldArea& Player::fieldArea(){
-    return *area_;
-}
-
 void Player::tapOnCreature_(int x, int y) {
     if (area_->isCellAvailable(x, y)) {
-        auto&& cr = area_->getCreatureByCell()
-        if (cr.isAlive() && cr.id() == creature_.id()) {
-            area_->killCell(x, y);
+        auto&& cr = area_->getCreatureByCell(x, y);
+        if (cr.isAlive() && cr.id() == creatId_) {
+            area_->killCreatureInCell(x, y);
         } else if (!cr.isAlive()) {
-            area_->reviveCell(x, y, creatId_);
+            area_->reviveCreatureInCell(x, y, creatId_);
         }
     }
 }

@@ -7,25 +7,33 @@
 
 namespace factory {
 
-struct IGameFieldAreaFactory {
+struct IGameFieldAreaCurryFactory {
     virtual
         std::unique_ptr<game_field_area::IGameFieldArea>
     createArea(
-        std::shared_ptr<game_field::IGameField> field,
         std::pair<int, int> upperLeftCorner, 
-        std::pair<int, int> lowerRightCorner) const = 0;
-    virtual ~IGameFieldAreaFactory() {} 
+        std::pair<int, int> lowerRightCorner) = 0;
+    virtual ~IGameFieldAreaCurryFactory() {} 
 };
 
-class GameFieldExcludedCellsAreaFactory : 
-public IGameFieldAreaFactory
+class GameFieldExcludedCellsAreaCurryFactory : 
+public IGameFieldAreaCurryFactory
 {
+    using GameFieldExcludedCells = 
+        game_field::GameFieldExcludedCells;
+
+public:
+    GameFieldExcludedCellsAreaCurryFactory(
+        std::shared_ptr<GameFieldExcludedCells> field);
+
 public:
     std::unique_ptr<game_field_area::IGameFieldArea>
     createArea(
-        std::shared_ptr<game_field::IGameField> field,
         std::pair<int, int> upperLeftCorner, 
-        std::pair<int, int> lowerRightCorner) const override;
+        std::pair<int, int> lowerRightCorner) override;
+
+private:
+    std::shared_ptr<GameFieldExcludedCells> field_;
 };
 
 } // namespace factory
