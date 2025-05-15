@@ -63,7 +63,7 @@ private:
     float cellWidth_;
     float cellHeight_;
     float gridThickness_;
-    std::tuple<bool, int, int>  lastCoordInput_ = {false, 0, 0};
+    std::tuple<bool, int, int>  lastCoordInput_ = {false, -1, -1};
 }; 
 
 }
