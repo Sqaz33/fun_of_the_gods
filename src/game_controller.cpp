@@ -182,7 +182,6 @@ void GameController::setupFieldForPlayer_(int N, int player) {
     setupPhase_ = true;
     auto p = players_[player];
     auto&& area = p->fieldArea();
-    auto a = typeid(area).name();
     curN_ = N;
     area.unlock();
     while (curN_ && !askedClose_ && !askedRestart_) {

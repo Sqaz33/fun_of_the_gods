@@ -30,7 +30,6 @@ public:
  */
 class IDrawableComposite : public IDrawable {
 public:
-    void draw(sf::RenderWindow& window, sf::Vector2f start) = 0;
     virtual void addComponent(
         std::shared_ptr<IDrawable> comp, const std::string& name) = 0;
 
