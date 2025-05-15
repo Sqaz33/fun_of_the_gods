@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <utility>
-#include <map>
+#include <unordered_map>
 
 #include "creature_factory.hpp"
 #include "game_field_area.hpp"
@@ -23,10 +23,10 @@ public:
     std::pair<bool, int> compute() override;
 
 private:
-    std::map<int, int> countNeighbors_(int xidx, int yidx) const;
+    std::unordered_map<int, int> countNeighbors_(int xidx, int yidx) const;
     void computeAside_();
     void applyNClearAside_();
-    std::map<int, bool> countAliveCreatureInArea_();
+    std::unordered_map<int, bool> countAliveCreatureInArea_();
 
 private:
     std::unique_ptr<IGameFieldArea> area_;

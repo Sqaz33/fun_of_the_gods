@@ -36,14 +36,14 @@ std::pair<bool, int> GameModel::compute() {
     return {true, 0};
 } 
 
-std::map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
+std::unordered_map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
     constexpr std::array<const std::pair<int, int>, 8> neighbors {{
         {-1,  -1}, {0, -1}, {1, -1},
         {-1,   0},          {1,  0},
         {-1,   1}, {0,  1}, {1,  1}  
     }};
 
-    std::map<int, int> res;
+    std::unordered_map<int, int> res;
     for (auto&& d : neighbors) {
         auto x = xidx + d.first;
         auto y = yidx + d.second;
@@ -104,8 +104,8 @@ void GameModel::applyNClearAside_() {
     aside_.clear();
 }
 
-std::map<int, bool> GameModel::countAliveCreatureInArea_() {
-    std::map<int, bool> res;
+std::unordered_map<int, bool> GameModel::countAliveCreatureInArea_() {
+    std::unordered_map<int, bool> res;
     auto corner = area_->upperLeftCorner();
     auto limW = area_->width() + corner.first;
     auto limH = area_->height() + corner.second;
