@@ -1,0 +1,6 @@
+find_package(GTest CONFIG REQUIRED)
+add_executable(tst ${SRC} tests.cpp)
+target_link_libraries(tst PRIVATE Core)
+target_compile_definitions(tst PRIVATE TEST)
+target_link_libraries(tst PRIVATE GTest::gtest)
+add_test(NAME tst COMMAND tst)

@@ -1,3 +1,4 @@
+#ifndef TEST
 #include <iostream>
 #include <exception>
 #include <memory>
@@ -8,7 +9,7 @@
 #include "cell.hpp"
 #include "creature.hpp"
 
-int main() {
+int main() try {
     using namespace game_field;
     using namespace game_field_area;
     using namespace game_model;
@@ -133,6 +134,8 @@ int main() {
     );
     // ###########################################################################
 
+
+    
     // configuring the subject-observer interaction //
     /////////////////////////////////////////////////////////////////
     field->attach(controller, 
@@ -156,11 +159,8 @@ int main() {
     controller->game();
     window->close();
     return 0;
+} catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return 1;
 }
-// } catch (const std::exception& e) {
-//     std::cerr << e.what() << '\n';
-// #ifdef DEBUG
-//      throw;
-// #endif
-//     return 1;
-// }
+#endif // TEST

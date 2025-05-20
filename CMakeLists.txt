@@ -6,21 +6,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 project(Fun_Of_The_Gods)
 
 if (UNIX) 
-    set(CMAKE_PREFIX_PATH "/mnt/d/sfml3ub")
+    set(SFML_LIB "/mnt/d/sfml3ub")
 else()
-    set(CMAKE_PREFIX_PATH "C:/SFML-3.0.0")
+    set(SFML_LIB "C:/SFML-3.0.0")
 endif()
+list(APPEND CMAKE_PREFIX_PATH ${SFML_LIB})
 
 find_package(SFML 3 REQUIRED COMPONENTS Graphics Window)
 
+add_library(Core INTERFACE)
+target_include_directories(Core INTERFACE "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(Core INTERFACE SFML::Graphics SFML::Window) 
+
 file(GLOB_RECURSE SRC "src/*.cpp")
+
 add_executable(${PROJECT_NAME} ${SRC})
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics SFML::Window) 
 
+target_link_libraries(${PROJECT_NAME} PRIVATE Core)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
 set(FONT_FILE 
     "${CMAKE_CURRENT_SOURCE_DIR}/game_data/calibri.ttf")
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -28,3 +31,5 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     "${FONT_FILE}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
 
+enable_testing()
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/test")
