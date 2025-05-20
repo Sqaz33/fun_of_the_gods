@@ -8,7 +8,8 @@ GameFieldExcludedCells::GameFieldExcludedCells(
         std::unique_ptr<factory::ICreatureFactory> creatFactory) :
     excludedCells_(excludedCells.begin(), excludedCells.end())
     , creatFactory_(std::move(creatFactory))
-{   initField_(width, height); 
+{   
+    initField_(width, height); 
     prepareField_(); 
 }
 
