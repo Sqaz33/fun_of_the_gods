@@ -64,7 +64,7 @@ int GameFieldExcludedCells::width() const noexcept
 int GameFieldExcludedCells::height() const noexcept 
 { return field_.size(); }
 
-bool GameFieldExcludedCells::isExludedCell(
+bool GameFieldExcludedCells::isExcludedCell(
     int xidx, int yidx) const 
 { return excludedCells_.contains({xidx, yidx}); }
 
@@ -88,7 +88,7 @@ void GameFieldExcludedCells::notify(
 void GameFieldExcludedCells::verifyThenThrowCellPos_(
     int xidx, int yidx) const 
 {
-    if (isExludedCell(xidx, yidx)) {
+    if (isExcludedCell(xidx, yidx)) {
         throw std::logic_error("Accessing a forbidden cell.");
     }
 }

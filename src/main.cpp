@@ -38,7 +38,7 @@ int main() try {
     ///////////////////////////
 
 
-
+    // create field
     // ###########################################################################
     auto creatFactory = 
         std::make_unique<CreatureFactory>();
@@ -51,7 +51,7 @@ int main() try {
     // ###########################################################################
 
 
-
+    // create and link view
     // ###########################################################################
     float gridWidth = gridCellWidth * field->width() 
                       + gridThickness * (field->width() + 1);
@@ -87,7 +87,7 @@ int main() try {
     // ###########################################################################
 
 
-
+    // create input
     // ###########################################################################
     float startX = frameThickness;
     float startY = frameThickness;
@@ -98,7 +98,7 @@ int main() try {
     // ###########################################################################
 
 
-
+    // create controller
     // ###########################################################################
     std::pair<int, int> ul = {0, 0};
     std::pair<int, int> lr = {field->width() - 1, 
@@ -134,7 +134,6 @@ int main() try {
     );
     // ###########################################################################
 
-
     
     // configuring the subject-observer interaction //
     /////////////////////////////////////////////////////////////////
@@ -158,6 +157,7 @@ int main() try {
 
     controller->game();
     window->close();
+    
     return 0;
 } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';

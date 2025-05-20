@@ -31,7 +31,7 @@ bool GameFieldExcludedCellsArea::isCellAvailable(
 {
     return IGameFieldArea::isCellAvailable(xidx, yidx) && 
            !isLocked_ &&
-           !field_->isExludedCell(xidx, yidx);
+           !field_->isExcludedCell(xidx, yidx);
 }
 
 void GameFieldExcludedCellsArea::reviveCreatureInCell(
@@ -73,7 +73,7 @@ void GameFieldExcludedCellsArea::clear() {
             for (int x = upperLeftCorner_.first; 
                 x <= lowerRightCorner_.second; ++x) 
             {   
-                if (!field_->isExludedCell(x, y)) {
+                if (!field_->isExcludedCell(x, y)) {
                     field_->clearCell(x, y);
                 }
             }
