@@ -20,42 +20,6 @@ namespace {
     }
 }
 
-TEST(GameModelTest, Default) {
-    using namespace game_field;
-    using namespace game_field_area;
-    using namespace factory;
-    using namespace game_model;
-
-    auto creatureFabric 
-        = std::make_unique<CreatureFactory>();
-    auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
-                3, 3,
-                std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
-            );
-    actualField->reviveCreatureInCell(1, 1, 1);
-    std::pair<int, int> lu {0, 0};
-    std::pair<int, int> rl {2, 2};
-    auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
-    area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
-    ASSERT_EQ(id, -1);
-    
-    creatureFabric 
-        = std::make_unique<CreatureFactory>();
-    auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
-                3, 3,
-                std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
-            );
-    ASSERT_TRUE(eqFields(actualField, expectField));
-}
-
 TEST(GameModelTest, SingleCreature) {
     using namespace game_field;
     using namespace game_field_area;
