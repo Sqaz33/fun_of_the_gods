@@ -74,7 +74,7 @@ enum class event_t : int {
     PLAYER_BETS_CREATURES,
     
     /**
-     * @brief Game model has calculated expected results.
+     * @brief Game model has calculated er.
      */
     GAME_MODEL_CALCULATED_ER,
     

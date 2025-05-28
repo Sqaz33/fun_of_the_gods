@@ -66,24 +66,11 @@ public:
      * @brief Handles notifications from observed subjects
      * @param subj Weak pointer to originating subject
      * @param event_t Type of event that occurred (from game_event::event_t)
-     * 
-     * @details Processes game events including:
-     * - Field/cell state changes
-     * - Game phase transitions
-     * - Player actions
-     * - Win/draw conditions
      */
     void update(std::weak_ptr<subject::ISubject> subj, int event_t) override;
 
     /**
      * @brief Main game execution loop
-     * 
-     * Manages the complete game lifecycle:
-     * 1. Initial setup and configuration
-     * 2. Main gameplay loop
-     * 3. Post-game states
-     * 4. Cleanup and restart handling
-     * 
      * @note Runs until game window is closed
      */
     void game();
@@ -92,12 +79,6 @@ private:
     // Rendering methods
     /**
      * @brief Updates and redraws the game window
-     * 
-     * Performs:
-     * - View component updates
-     * - Window clearing
-     * - Drawing of all elements
-     * - Display buffer swap
      */
     void redrawWindowNDisplay_();
     
@@ -121,11 +102,6 @@ private:
 
     /**
      * @brief Resets controller state for new game
-     * 
-     * Clears all transient state and prepares for:
-     * - New game initialization
-     * - Model reset
-     * - View reset
      */
     void restartController_();
 
