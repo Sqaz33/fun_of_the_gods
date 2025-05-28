@@ -104,39 +104,45 @@ int main() try {
     std::pair<int, int> lr = {field->width() - 1, 
                                     field->height() - 1};
         
-    auto modelArea = 
-        std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
-    modelArea->unlock();
-    auto model = std::make_unique<GameModel>(std::move(modelArea), 2);
-
     std::vector<std::shared_ptr<Player>> players(2);
     for (auto& p : players) {
         p.reset(new Player());
     }
 
+    auto modelArea = 
+        std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
+    modelArea->unlock();
     auto areaFactory = 
         std::make_unique<
             GameFieldExcludedCellsAreaCurryFactory>(field);
+    auto model = std::make_shared<GameModel>(
+        K, N, T, 
+        std::move(modelArea), 
+        std::move(areaFactory), 
+        players);
 
-    std::unordered_map<int, sf::Color> crColors 
-        { {-1, sf::Color::White}, {0, sf::Color::Red}, {1, sf::Color::Blue} };
+    std::unordered_map<int, sf::Color> crColors { 
+        {-1, sf::Color::White}, 
+        {0, sf::Color::Red}, 
+        {1, sf::Color::Blue} 
+    };
 
     auto controllerArea = 
         std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
     controllerArea->unlock();
-    
     auto controller = std::make_shared<GameController>(
-        K, T, N,
-        std::move(controllerArea), std::move(areaFactory),
-        std::move(model),  stackL, 
-        players, input,
-        window, crColors
+        std::move(controllerArea), 
+        model,  stackL, 
+        input, window, 
+        crColors
     );
     // ###########################################################################
 
     
     // configuring the subject-observer interaction //
     /////////////////////////////////////////////////////////////////
+
+    // controller
     field->attach(controller, 
         static_cast<int>(event_t::FIELD_CLEAR));
     field->attach(controller, 
@@ -145,10 +151,28 @@ int main() try {
         static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
     field->attach(controller, 
         static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
-    input->attach(controller, 
-        static_cast<int>(event_t::USER_ASKED_RESTART));
-    input->attach(controller, 
+    model->attach(controller, 
+        static_cast<int>(event_t::PLAYER_BETS_CREATURES));
+    model->attach(controller,
+        static_cast<int>(event_t::GAME_MOEL_CALCULATED_ER));
+    model->attach(controller,
+        static_cast<int>(event_t::WINNER_DETERMINATE));
+    model->attach(controller,
+        static_cast<int>(event_t::DRAW_DETERMINATE));
+    model->attach(controller,
+        static_cast<int>(event_t::USER_INPUT_REQUIRED));
+
+    // model
+    input->attach(model, 
         static_cast<int>(event_t::USER_ASKED_CLOSE));
+    input->attach(model, 
+        static_cast<int>(event_t::USER_ASKED_RESTART));
+    field->attach(model, 
+        static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
+    field->attach(model, 
+        static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
+
+    // players
     for (auto&& p : players) {
         input->attach(p, 
             static_cast<int>(event_t::USER_ASKED_SET_CREATURE));

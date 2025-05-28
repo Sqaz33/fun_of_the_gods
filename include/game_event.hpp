@@ -5,7 +5,7 @@
  * Contains enumeration of all possible game events used for communication
  * between game components through the observer pattern.
  */
-
+//TODO dox
 #ifndef GAME_EVENT_HPP
 #define GAME_EVENT_HPP
 
@@ -59,6 +59,12 @@ enum class event_t : int {
      * @brief User requested to set a creature on the field.
      */
     USER_ASKED_SET_CREATURE,
+
+    WINNER_DETERMINATE,
+    DRAW_DETERMINATE,
+    PLAYER_BETS_CREATURES,
+    GAME_MOEL_CALCULATED_ER,
+    USER_INPUT_REQUIRED
 };
 
 } // namespace game_event
