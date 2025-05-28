@@ -302,7 +302,7 @@ void GameModel::firePlayerBetsCreatures_() {
 
 void GameModel::fireGameModelCalculatedEr_() {
     int evt = static_cast<int>(
-        game_event::event_t::GAME_MOEL_CALCULATED_ER);
+        game_event::event_t::GAME_MODEL_CALCULATED_ER);
     notify(evt, slf());   
 }
 

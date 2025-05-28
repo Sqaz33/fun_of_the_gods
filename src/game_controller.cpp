@@ -74,7 +74,7 @@ void GameController::update(
             gameModelSetupPhase_ = true;
             break;
         }
-        case evt_t::GAME_MOEL_CALCULATED_ER: {
+        case evt_t::GAME_MODEL_CALCULATED_ER: {
             auto erRem = model_->erRemained();
             notifyAboutModelComputing_(erRem);
             gameModelSetupPhase_ = false;
@@ -86,7 +86,7 @@ void GameController::update(
             break;
         }
         case evt_t::DRAW_DETERMINATE: {
-            noitfyAboutDraw_();
+            notifyAboutDraw_();
             break;
         }
         case evt_t::USER_INPUT_REQUIRED: {
@@ -153,7 +153,7 @@ void GameController::notifyAboutWinner_(int player) {
     setTextOnTextComp_(ss.str());
 }
 
-void GameController::noitfyAboutDraw_() {
+void GameController::notifyAboutDraw_() {
     setTextOnTextComp_("Draw!");
 }
 

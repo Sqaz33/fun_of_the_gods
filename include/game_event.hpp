@@ -3,9 +3,11 @@
  * @brief Header file defining game event types.
  * 
  * Contains enumeration of all possible game events used for communication
- * between game components through the observer pattern.
+ * between game components through the observer pattern. Events represent
+ * significant state changes or user actions that need to be communicated
+ * across different game systems.
  */
-//TODO dox
+
 #ifndef GAME_EVENT_HPP
 #define GAME_EVENT_HPP
 
@@ -17,16 +19,12 @@ namespace game_event {
  * 
  * These events are used to notify observers about changes in the game state.
  * Each event corresponds to a specific action or state change in the game.
- */
-enum class event_t : int;
-
-/**
- * @enum event_t
- * @brief Enumeration of all possible game event types (implementation).
+ * The events are used within the observer pattern implementation to allow
+ * decoupled communication between game systems.
  */
 enum class event_t : int {
     /**
-     * @brief Entire game field has been cleared.
+     * @brief Entire game field has been cleared (all cells reset).
      */
     FIELD_CLEAR = 0,
     
@@ -36,17 +34,17 @@ enum class event_t : int {
     CELL_CLEAR_IN_FIELD,
     
     /**
-     * @brief A creature has been killed in the field.
+     * @brief A creature has been killed/removed from the field.
      */
     CREATURE_KILL_IN_FIELD,
     
     /**
-     * @brief A creature has been revived in the field.
+     * @brief A creature has been revived/added to the field.
      */
     CREATURE_REVIVE_IN_FIELD,
     
     /**
-     * @brief User requested to close the game.
+     * @brief User requested to close/exit the game.
      */
     USER_ASKED_CLOSE,
     
@@ -56,14 +54,33 @@ enum class event_t : int {
     USER_ASKED_RESTART,
     
     /**
-     * @brief User requested to set a creature on the field.
+     * @brief User requested to place a creature on the field.
      */
     USER_ASKED_SET_CREATURE,
 
+    /**
+     * @brief A winner has been determined in the game.
+     */
     WINNER_DETERMINATE,
+    
+    /**
+     * @brief The game has ended in a draw.
+     */
     DRAW_DETERMINATE,
+    
+    /**
+     * @brief Player has placed bets on creatures (for betting systems).
+     */
     PLAYER_BETS_CREATURES,
-    GAME_MOEL_CALCULATED_ER,
+    
+    /**
+     * @brief Game model has calculated expected results.
+     */
+    GAME_MODEL_CALCULATED_ER,
+    
+    /**
+     * @brief System requires user input to proceed.
+     */
     USER_INPUT_REQUIRED
 };
 

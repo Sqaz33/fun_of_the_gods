@@ -154,7 +154,7 @@ int main() try {
     model->attach(controller, 
         static_cast<int>(event_t::PLAYER_BETS_CREATURES));
     model->attach(controller,
-        static_cast<int>(event_t::GAME_MOEL_CALCULATED_ER));
+        static_cast<int>(event_t::GAME_MODEL_CALCULATED_ER));
     model->attach(controller,
         static_cast<int>(event_t::WINNER_DETERMINATE));
     model->attach(controller,
