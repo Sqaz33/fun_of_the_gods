@@ -180,7 +180,9 @@ private:
      * @param erCount Number of ER calculations to perform
      */
     void computeErs_(int erCount);
-
+#ifdef TEST
+public:
+#endif
     // Model compute methods
     /**
      * @brief Computes one iteration of the game model.
@@ -195,7 +197,9 @@ private:
      *       4. Any dead cell with exactly three live neighbors becomes alive
      */
     std::pair<bool, int> computeEr_();
-
+#ifdef TEST
+private:
+#endif
     /**
      * @brief Counts neighboring creatures for a given cell.
      * @param xidx X coordinate of the cell

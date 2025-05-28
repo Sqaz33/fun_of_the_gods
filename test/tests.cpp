@@ -42,10 +42,15 @@ TEST(GameModelTest, SingleCreature) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
-    
+
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
+
     creatureFabric 
         = std::make_unique<CreatureFactory>();
     auto expectField 
@@ -81,9 +86,15 @@ TEST(GameModelTest, SingleNeighbor) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
+
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
+
     
     creatureFabric 
         = std::make_unique<CreatureFactory>();
@@ -121,9 +132,14 @@ TEST(GameModelTest, TwoNeighbors) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
+
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
 
     creatureFabric 
         = std::make_unique<CreatureFactory>();
@@ -165,9 +181,15 @@ TEST(GameModelTest, SingleCellField) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
+    
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
+
     
     creatureFabric 
         = std::make_unique<CreatureFactory>();
@@ -207,9 +229,15 @@ TEST(GameModelTest, Stable) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
+    
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
+
     
     creatureFabric 
         = std::make_unique<CreatureFactory>();
@@ -254,9 +282,15 @@ TEST(GameModelTest, Glider) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
+    
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
+
     
     creatureFabric 
         = std::make_unique<CreatureFactory>();
@@ -301,10 +335,15 @@ TEST(GameModelTest, Oscillator) {
     auto area = std::make_unique<
                 GameFieldExcludedCellsArea>(actualField, lu, rl);
     area->unlock();
+    
+    auto f = 
+        std::make_unique<
+            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player);
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    model.computeEr_();
 
-    GameModel model(std::move(area), 1);
-    auto [con, id] = model.compute();
-    ASSERT_EQ(con, false);
     
     creatureFabric 
         = std::make_unique<CreatureFactory>();

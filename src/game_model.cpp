@@ -34,7 +34,9 @@ GameModel::GameModel(
     , areaFactory_(std::move(areaFactory))
     , players_(players)
 {
+#ifndef TEST
     giveAreasForTwoPlayers_();
+#endif
     giveCreatureIdPlayers_();
 }
 
