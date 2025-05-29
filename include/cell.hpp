@@ -80,4 +80,4 @@ private:
 
 } // namespace cell
 
-#endif
+#endif // CELL_HPP

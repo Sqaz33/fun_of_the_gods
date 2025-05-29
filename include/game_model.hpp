@@ -238,14 +238,14 @@ private:
 
 private:
     // Configuration
-    const int creatNumberFirstTime_;      ///< Initial creature count per player
-    const int creatNumber_;               ///< Regular creature count per player
-    const int erCount_;                   ///< ER calculations per turn
+    const int creatNumberFirstTime_;                          ///< Initial creature count per player
+    const int creatNumber_;                                   ///< Regular creature count per player
+    const int erCount_;                                       ///< ER calculations per turn
     std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory_; ///< Area factory
-    std::unique_ptr<IGameFieldArea> area_;  ///< Game field area being modeled
+    std::unique_ptr<IGameFieldArea> area_;                    ///< Game field area being modeled
     
     // Computation state
-    std::vector<std::tuple<int, bool, int, int>> aside_; ///< State transition buffer
+    std::vector<std::tuple<int, bool, int, int>> aside_;   ///< State transition buffer
     std::vector<std::shared_ptr<player::Player>> players_; ///< List of players
 
     // Game state

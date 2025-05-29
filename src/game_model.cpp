@@ -7,6 +7,8 @@
 #include <iterator>
 #include <chrono>
 #include <thread>
+#include <ranges>
+#include <random>
 
 namespace {
     using IGameFieldArea = game_field_area::IGameFieldArea;
@@ -223,6 +225,7 @@ std::unordered_map<int, int> GameModel::countNeighbors_(int xidx, int yidx) cons
 }
 
 void GameModel::computeAside_() {
+    namespace views = std::ranges::views;
     auto luCorner = area_->upperLeftCorner();
     auto rdCorner = area_->lowerRightCorner();
     
@@ -239,7 +242,18 @@ void GameModel::computeAside_() {
                         auto max = std::max_element(ne.begin(), ne.end(), 
                                                     [] (auto&& l, auto&& p) 
                                                     { return l.second < p.second; });
-                        int id = max->first;
+                        auto matchingMax = ne | 
+                            views::filter([&max](auto&& v) 
+                                    { return v.second == max->second; });
+                        auto szMax = std::distance(matchingMax.begin(), 
+                                                    matchingMax.end());
+                        std::random_device r;
+                        std::default_random_engine e1(r());
+                        std::uniform_int_distribution<int> uniform_dist(0, szMax - 1);
+                        int mean = uniform_dist(e1);
+                        auto resMax = matchingMax.begin();
+                        std::advance(resMax, mean);
+                        int id = resMax->first;
                         aside_.emplace_back(id, true, x, y);
                     }
                 } else if (isAlive) {
@@ -251,8 +265,7 @@ void GameModel::computeAside_() {
 }
 
 void GameModel::applyNClearAside_() {
-    for (auto&& as : aside_) {
-        auto [id, rev, x, y] = as;
+    for (auto [id, rev, x, y] : aside_) {
         if (rev) {
             area_->reviveCreatureInCell(x, y, id);
         } else {
