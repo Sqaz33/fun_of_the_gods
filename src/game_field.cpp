@@ -5,9 +5,11 @@ namespace game_field {
 GameFieldExcludedCells::GameFieldExcludedCells(
         int width, int height, 
         const std::vector<std::pair<int, int>>& excludedCells,
-        std::unique_ptr<factory::ICreatureFactory> creatFactory) :
+        std::unique_ptr<factory::ICreatureFactory> creatFactory,
+        std::unique_ptr<factory::ICellFactory> cellFactory) :
     excludedCells_(excludedCells.begin(), excludedCells.end())
     , creatFactory_(std::move(creatFactory))
+    , cellFactory_(std::move(cellFactory))
 {   
     initField_(width, height); 
     prepareField_(); 
@@ -17,7 +19,7 @@ void GameFieldExcludedCells::reviveCreatureInCell(
     int xidx, int yidx, int id)
 {   
     verifyThenThrowCellPos_(xidx, yidx);
-    field_.at(yidx).at(xidx).creature().revive(id); 
+    field_.at(yidx).at(xidx)->creature().revive(id); 
     lastAffectedCell_ = { xidx, yidx }; 
     fireCreatureRevive_();
 }
@@ -26,7 +28,7 @@ void GameFieldExcludedCells::killCreatureInCell(
     int xidx, int yidx)
 { 
     verifyThenThrowCellPos_(xidx, yidx);
-    field_.at(yidx).at(xidx).creature().kill(); 
+    field_.at(yidx).at(xidx)->creature().kill(); 
     lastAffectedCell_ = { xidx, yidx }; 
     fireCreatureKill_();
 }
@@ -34,7 +36,7 @@ void GameFieldExcludedCells::killCreatureInCell(
 const creature::ICreature&
 GameFieldExcludedCells::getCreatureByCell(int xidx, int yidx) const {
     verifyThenThrowCellPos_(xidx, yidx);
-    return field_.at(yidx).at(xidx).creature();
+    return field_.at(yidx).at(xidx)->creature();
 }
 
 void GameFieldExcludedCells::clear() {
@@ -48,7 +50,7 @@ void GameFieldExcludedCells::clear() {
 
 void GameFieldExcludedCells::clearCell(int xidx, int yidx) {
     verifyThenThrowCellPos_(xidx, yidx);
-    field_.at(yidx).at(xidx).setCreature(
+    field_.at(yidx).at(xidx)->setCreature(
         creatFactory_->createCreature());
     lastAffectedCell_ = { xidx, yidx }; 
     fireCellClear_();
@@ -120,7 +122,7 @@ void GameFieldExcludedCells::fireCreatureKill_() {
 void GameFieldExcludedCells::prepareField_() {
     for (auto&& row : field_) {
         for (auto&& cell : row) {
-            cell.setCreature(creatFactory_->createCreature());
+            cell->setCreature(creatFactory_->createCreature());
         }
     }
 }
@@ -128,9 +130,9 @@ void GameFieldExcludedCells::prepareField_() {
 void GameFieldExcludedCells::initField_(int width, int height) {
     field_ = decltype(field_)();
     for (int i = 0; i < height; ++i) {
-        std::vector<cell::Cell> r;
+        std::vector<std::unique_ptr<cell::ICell>> r;
         for (int j = 0; j < width; ++j) {
-            r.emplace_back(cell::Cell());
+            r.emplace_back(cellFactory_->createCell());
         }
         field_.emplace_back(std::move(r));
     }

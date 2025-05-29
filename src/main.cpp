@@ -42,11 +42,14 @@ int main() try {
     // ###########################################################################
     auto creatFactory = 
         std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
 
     auto field = std::make_shared<GameFieldExcludedCells>(
                     fieldWidth, fieldHeight, 
                     std::vector<std::pair<int, int>>(),
-                    std::move(creatFactory)
+                    std::move(creatFactory),
+                    std::move(cellFactory)
                 );
     // ###########################################################################
 

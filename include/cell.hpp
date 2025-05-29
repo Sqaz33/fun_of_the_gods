@@ -41,7 +41,7 @@ struct ICell {
     /**
      * @brief Virtual destructor for proper polymorphic destruction.
      */
-    virtual ~ICell() {}
+    virtual ~ICell() = default;
 };
 
 /**

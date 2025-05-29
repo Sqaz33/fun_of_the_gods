@@ -14,10 +14,10 @@
 #include <utility>
 #include <stdexcept>
 
-#include "cell.hpp"
 #include "game_event.hpp"
 #include "subject.hpp"
 #include "creature_factory.hpp"
+#include "cell_factory.hpp"
 
 namespace game_field {
 
@@ -115,11 +115,13 @@ public:
      * @param height Field height in cells
      * @param excludedCells Vector of (x,y) coordinates of excluded cells
      * @param creatFactory Factory for creating creatures
+     * @param cellFactory Factory for creating cells 
      */
     GameFieldExcludedCells(
         int width, int height,
         const std::vector<std::pair<int, int>>& excludedCells,
-        std::unique_ptr<factory::ICreatureFactory> creatFactory);
+        std::unique_ptr<factory::ICreatureFactory> creatFactory,
+        std::unique_ptr<factory::ICellFactory> cellFactory);
     
     // IGameField interface implementation
     const creature::ICreature& getCreatureByCell(int xidx, int yidx) const override;
@@ -195,10 +197,11 @@ private:
     void initField_(int width, int height);
     
 private:
-    std::vector<std::vector<cell::Cell>> field_;          ///< 2D vector of cells
-    std::set<std::pair<int, int>> excludedCells_;         ///< Set of excluded cell coordinates
-    std::pair<int, int> lastAffectedCell_ = {-1, -1};     ///< Last modified cell coordinates
-    std::unique_ptr<factory::ICreatureFactory> creatFactory_; ///< Creature factory
+    std::vector<std::vector<std::unique_ptr<cell::ICell>>> field_;    ///< 2D vector of cells
+    std::set<std::pair<int, int>> excludedCells_;                     ///< Set of excluded cell coordinates
+    std::pair<int, int> lastAffectedCell_ = {-1, -1};                 ///< Last modified cell coordinates
+    std::unique_ptr<factory::ICreatureFactory> creatFactory_;         ///< Creature factory
+    std::unique_ptr<factory::ICellFactory> cellFactory_;              ///< Cell factory
 };
 
 } // namespace game_field

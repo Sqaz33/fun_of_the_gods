@@ -26,13 +26,16 @@ TEST(GameModelTest, SingleCreature) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(1, 1, 1);
@@ -51,13 +54,16 @@ TEST(GameModelTest, SingleCreature) {
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -69,13 +75,16 @@ TEST(GameModelTest, SingleNeighbor) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(1, 1, 1);
@@ -96,13 +105,16 @@ TEST(GameModelTest, SingleNeighbor) {
     model.computeEr_();
 
     
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -114,13 +126,16 @@ TEST(GameModelTest, TwoNeighbors) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(1, 1, 1);
@@ -141,13 +156,16 @@ TEST(GameModelTest, TwoNeighbors) {
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     expectField->reviveCreatureInCell(1, 1, 1);
@@ -165,13 +183,16 @@ TEST(GameModelTest, SingleCellField) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 1, 1,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(0, 0, 1);
@@ -191,13 +212,16 @@ TEST(GameModelTest, SingleCellField) {
     model.computeEr_();
 
     
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 1, 1,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -209,13 +233,16 @@ TEST(GameModelTest, Stable) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 4, 4,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(1, 1, 1);
@@ -239,13 +266,16 @@ TEST(GameModelTest, Stable) {
     model.computeEr_();
 
     
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 4, 4,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     expectField->reviveCreatureInCell(1, 1, 1);
@@ -262,13 +292,16 @@ TEST(GameModelTest, Glider) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 5, 5,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(0, 2, 1);
@@ -292,13 +325,16 @@ TEST(GameModelTest, Glider) {
     model.computeEr_();
 
     
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 5, 5,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     expectField->reviveCreatureInCell(1, 1, 1);
@@ -316,13 +352,16 @@ TEST(GameModelTest, Oscillator) {
     using namespace factory;
     using namespace game_model;
 
-    auto creatureFabric 
+    auto creatureFactory 
         = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
     auto actualField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
     
     actualField->reviveCreatureInCell(0, 1, 1);
@@ -345,13 +384,16 @@ TEST(GameModelTest, Oscillator) {
     model.computeEr_();
 
     
-    creatureFabric 
+    creatureFactory 
         = std::make_unique<CreatureFactory>();
+    cellFactory =
+        std::make_unique<CellFactory>();
     auto expectField 
         = std::make_shared<GameFieldExcludedCells>(
                 3, 3,
                 std::vector<std::pair<int, int>>(),
-                std::move(creatureFabric)
+                std::move(creatureFactory),
+                std::move(cellFactory)
             );
 
     expectField->reviveCreatureInCell(1, 0, 1);
