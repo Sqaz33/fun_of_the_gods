@@ -162,7 +162,7 @@ void GameModel::setupFieldForPlayer_(int creatureNumber, int player) {
 }
 
 void GameModel::computeErs_(int erCount) {
-    while (!askedClose_ && !askedRestart_ && erCount) {
+    while (!roundIsOver_ && !askedClose_ && !askedRestart_ && erCount) {
         erRemained_ = erCount--;
         fireGameModelCalculatedEr_();
         auto [suc, id] = computeEr_(); 
