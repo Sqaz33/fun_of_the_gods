@@ -25,14 +25,14 @@ void ISubject::detach(
     }
 }
 
-void ISubject::notify(int event_t, std::weak_ptr<ISubject> slf) {
+void ISubject::notify(int event_t) {
     auto [it, end] = obs_.equal_range(event_t);
     while (it != end) {
         if (it->second.expired())  {
             it = obs_.erase(it);
         } else { 
             auto sptr = it->second.lock();
-            sptr->update(slf, event_t);
+            sptr->update(event_t);
             ++it;
         } 
     }

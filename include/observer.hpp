@@ -27,15 +27,8 @@ namespace observer {
  */
 struct IObserver {
     /**
-     * @brief Receives update notifications from observed subjects.
-     * @param subj Weak pointer to the subject that triggered the update
-     * @param event_t Type of event that occurred (game_event::event_t)
-     * 
-     * @note The weak_ptr prevents circular dependencies between subject and observer.
-     *       Observers should check if the subject still exists before accessing it.
      */
-    virtual void update(
-        std::weak_ptr<subject::ISubject> subj, int event_t) = 0;
+    virtual void update(int event_t) = 0;
     
     /**
      * @brief Virtual destructor for polymorphic behavior.

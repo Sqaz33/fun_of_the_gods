@@ -17,4 +17,12 @@ void Cell::setCreature(
     creat_ = std::move(creat);
 }
 
+bool Cell::hasCreature() const {
+    return static_cast<bool>(creat_);
+}
+
+void Cell::removeCreature() {
+    creat_.release();
+}
+
 } // namespace cell

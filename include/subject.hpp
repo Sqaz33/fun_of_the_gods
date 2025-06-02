@@ -53,7 +53,7 @@ protected:
      * @param event_t The event type that occurred
      * @param slf Weak pointer to this subject (to avoid shared_from_this in interface)
      */
-    virtual void notify(int event_t, std::weak_ptr<ISubject> slf) = 0;
+    virtual void notify(int event_t) = 0;
 
 private:  
     std::unordered_multimap<

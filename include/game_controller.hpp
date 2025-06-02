@@ -60,14 +60,15 @@ public:
         std::shared_ptr<view::IDrawableComposite> view,
         std::shared_ptr<IUserInput> input,
         std::shared_ptr<sf::RenderWindow> window,
-        const std::unordered_map<int, sf::Color>& creatureColors);
+        const std::unordered_map<int, sf::Color>& playersCreatureColors,
+        const std::shared_ptr<IGameField> field);
 
     /**
      * @brief Handles notifications from observed subjects
      * @param subj Weak pointer to originating subject
      * @param event_t Type of event that occurred (from game_event::event_t)
      */
-    void update(std::weak_ptr<subject::ISubject> subj, int event_t) override;
+    void update(int event_t) override;
 
     /**
      * @brief Main game execution loop
@@ -107,10 +108,9 @@ private:
 
     // Notification handlers
     /**
-     * @brief Handles winner determination event
-     * @param player Winning player ID (0 or 1)
+
      */
-    void notifyAboutWinner_(int player);
+    void notifyAboutWinner_(const std::string& name);
     
     /**
      * @brief Handles draw condition event
@@ -118,17 +118,16 @@ private:
     void notifyAboutDraw_();
     
     /**
-     * @brief Processes player participation updates
-     * @param player Player ID (0 or 1)
-     * @param n Participation state code
+
      */
-    void notifyAboutPlayerParticipation_(int player, int n);
+    void notifyAboutPlayerParticipation_(
+        const std::string& name, int moveRemained);
     
     /**
      * @brief Handles model computation progress updates
      * @param n Current computation iteration
      */
-    void notifyAboutModelComputing_(int n);
+    void notifyAboutModelComputing_(int erRemained);
     
     /**
      * @brief Updates text display component
@@ -143,9 +142,10 @@ private:
     std::shared_ptr<view::IDrawableComposite> view_;///< Visual representation
     std::shared_ptr<IUserInput> input_;             ///< User input processing
     std::shared_ptr<sf::RenderWindow> window_;      ///< Render target
+    const std::shared_ptr<IGameField> field_;
 
     // Configuration
-    std::unordered_map<int, sf::Color> creatureColors_; ///< Creature visualization colors
+    std::unordered_map<int, sf::Color> playersCreatureColors_; ///< Creature visualization colors
 
     // State flags
     bool gameModelSetupPhase_ = false; ///< Tracks initialization phase status

@@ -2,12 +2,14 @@
 #include <iostream>
 #include <exception>
 #include <memory>
+#include <format>
 
 #include "view.hpp"
 #include "game_model.hpp"
 #include "game_controller.hpp"
 #include "cell.hpp"
 #include "creature.hpp"
+#include "player.hpp"
 
 int main() try {
     using namespace game_field;
@@ -108,8 +110,10 @@ int main() try {
                                     field->height() - 1};
         
     std::vector<std::shared_ptr<Player>> players(2);
+    int id = 0;
     for (auto& p : players) {
-        p.reset(new Player());
+        p.reset(new Player(id, std::format("Player {}", id)));
+        ++id;
     }
 
     auto modelArea = 
@@ -137,7 +141,8 @@ int main() try {
         std::move(controllerArea), 
         model,  stackL, 
         input, window, 
-        crColors
+        crColors,
+        field
     );
     // ###########################################################################
 
@@ -164,6 +169,8 @@ int main() try {
         static_cast<int>(event_t::DRAW_DETERMINATE));
     model->attach(controller,
         static_cast<int>(event_t::USER_INPUT_REQUIRED));
+    input->attach(controller, 
+        static_cast<int>(event_t::USER_ASKED_SET_CREATURE));
 
     // model
     input->attach(model, 
@@ -174,12 +181,6 @@ int main() try {
         static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
     field->attach(model, 
         static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
-
-    // players
-    for (auto&& p : players) {
-        input->attach(p, 
-            static_cast<int>(event_t::USER_ASKED_SET_CREATURE));
-    }
     /////////////////////////////////////////////////////////////////
 
     controller->game();

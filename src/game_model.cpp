@@ -39,7 +39,6 @@ GameModel::GameModel(
 #ifndef TEST
     giveAreasForTwoPlayers_();
 #endif
-    giveCreatureIdPlayers_();
 }
 
 void GameModel::attach(
@@ -50,18 +49,13 @@ void GameModel::detach(
     std::weak_ptr<observer::IObserver> obs, int event_t) 
 { subject::ISubject::detach(obs, event_t); }
 
-void GameModel::notify(
-    int event_t, std::weak_ptr<ISubject> slf) 
-{ subject::ISubject::notify(event_t, slf); }
+void GameModel::notify(int event_t) 
+{ subject::ISubject::notify(event_t); }
 
-void GameModel::update(
-    std::weak_ptr<subject::ISubject> subj, int event_t)
+void GameModel::update(int event_t)
 {
     using evt_t = game_event::event_t;
     auto evt = static_cast<evt_t>(event_t);
-    auto lk = subj.lock();
-    auto field = 
-        std::dynamic_pointer_cast<game_field::IGameField>(lk);
     switch (evt) {
         case evt_t::USER_ASKED_CLOSE: {
             askedClose_ = true;
@@ -86,10 +80,6 @@ void GameModel::update(
     }
 }
 
-std::shared_ptr<GameModel> GameModel::slf() {
-    return shared_from_this();
-}
-
 void GameModel::game() {
     while (!askedClose_) {
         askedRestart_ = false;
@@ -105,11 +95,13 @@ void GameModel::game() {
     } 
 }
 
-int GameModel::curPlayer() const noexcept {
+std::shared_ptr<player::Player> 
+GameModel::curPlayer() const noexcept {
     return curPlayer_;
 }
 
-int GameModel::winnerPlayer() const noexcept {
+std::shared_ptr<player::Player> 
+GameModel::winnerPlayer() const noexcept {
     return winnerPlayer_;
 }
 
@@ -135,24 +127,18 @@ void GameModel::giveAreasForTwoPlayers_() {
     players_[1]->setFieldArea(std::move(area2));
 }
 
-void GameModel::giveCreatureIdPlayers_() {
-    for (auto&& p : players_) {
-        auto id = creature::nextCreatureId();
-        p->setCreatId(id);
-    }
-}
-
 void GameModel::setupField_(int creatureNumber) {
-    for (int i = 0; i < players_.size(); ++i) {
-        setupFieldForPlayer_(creatNumber_, i);
+    for (auto&& p : players_) {
+        setupFieldForPlayer_(creatNumber_, p);
     }
 }
 
-void GameModel::setupFieldForPlayer_(int creatureNumber, int player) {
+void GameModel::setupFieldForPlayer_(int creatureNumber, 
+    std::shared_ptr<player::Player> player) 
+{
     setupPhase_ = true;
-    auto p = players_[player];
-    auto&& area = p->fieldArea();
     curPlayer_ = player;
+    auto&& area = player->fieldArea();
     curPlayerCreatNumber_ = creatureNumber;
     area.unlock();
     while (curPlayerCreatNumber_ && !askedClose_ && !askedRestart_) {
@@ -167,11 +153,11 @@ void GameModel::computeErs_(int erCount) {
     while (!roundIsOver_ && erCount) {
         erRemained_ = erCount--;
         fireGameModelCalculatedEr_();
-        auto [suc, id] = computeEr_(); 
+        auto [suc, win, player] = computeEr_(); 
         if (!suc) {
             roundIsOver_ = true;
-            winnerPlayer_ = id;
-            if (id == -1) {
+            winnerPlayer_ = player;
+            if (!win) {
                 fireThereWasDraw_();
             } else {
                 fireWinnerDeterminate_();
@@ -183,41 +169,43 @@ void GameModel::computeErs_(int erCount) {
     }
 }
 
-std::pair<bool, int> GameModel::computeEr_() {
+std::tuple<bool, bool, std::shared_ptr<player::Player>> 
+GameModel::computeEr_() 
+{
     computeAside_();
     applyNClearAside_();
-    auto count = countAliveCreatureInArea_();
+    auto count = checkCreatureInArea_();
     if (count.size() < 2) {
         if (count.size() == 1) {
-            return {false, count.begin()->first};
+            return {false, true, *count.begin()};
         } 
-        return {false, -1};
+        return {false, false, nullptr};
     }
-    return {true, 0};
+    return {true, false, nullptr};
 } 
 
-std::unordered_map<int, int> GameModel::countNeighbors_(int xidx, int yidx) const {
+std::map<std::shared_ptr<player::Player>, int> 
+GameModel::countNeighbors_(int xidx, int yidx) const {
     constexpr std::array<const std::pair<int, int>, 8> neighbors {{
         {-1,  -1}, {0, -1}, {1, -1},
         {-1,   0},          {1,  0},
         {-1,   1}, {0,  1}, {1,  1}  
     }};
 
-    std::unordered_map<int, int> res;
+    std::map<std::shared_ptr<player::Player>, int> res;
     for (auto&& d : neighbors) {
         auto x = xidx + d.first;
         auto y = yidx + d.second;
-        if (area_->isCellAvailable(x, y)) {
+        if (area_->isCellAvailable(x, y) && 
+            area_->hasCreatureInCell(x, y)) 
+        {
             auto&& cr = area_->getCreatureByCell(x, y);
-            if (cr.isAlive()) {
-                auto it = res.find(cr.id());
-                if (it != res.end()) {
-                    ++it->second;
-                } else {
-                    res[cr.id()] = 1;
-                }
+            auto it = res.find(cr.player());
+            if (it != res.end()) {
+                ++it->second;
+            } else {
+                res[cr.player()] = 1;
             }
-    
         }
     }
 
@@ -235,8 +223,7 @@ void GameModel::computeAside_() {
                 auto ne = countNeighbors_(x, y);
                 int neSum = std::accumulate(ne.begin(), ne.end(), 
                                 0, [] (int i, auto&& p) { return i + p.second; });
-                auto&& cr = area_->getCreatureByCell(x, y);
-                bool isAlive = cr.isAlive();
+                bool isAlive = area_->hasCreatureInCell(x, y);
                 if (computeLiveStatusConwayGame(isAlive, neSum)) {
                     if (!isAlive) {
                         auto max = std::max_element(ne.begin(), ne.end(), 
@@ -253,11 +240,11 @@ void GameModel::computeAside_() {
                         int mean = uniform_dist(e1);
                         auto resMax = matchingMax.begin();
                         std::advance(resMax, mean);
-                        int id = resMax->first;
-                        aside_.emplace_back(id, true, x, y);
+                        auto player = resMax->first;
+                        aside_.emplace_back(player, true, x, y);
                     }
                 } else if (isAlive) {
-                    aside_.emplace_back(0, false, x, y);
+                    aside_.emplace_back(nullptr, false, x, y);
                 }
             }
         }
@@ -265,27 +252,29 @@ void GameModel::computeAside_() {
 }
 
 void GameModel::applyNClearAside_() {
-    for (auto [id, rev, x, y] : aside_) {
-        if (rev) {
-            area_->reviveCreatureInCell(x, y, id);
+    for (auto [player, set, x, y] : aside_) {
+        if (set) {
+            area_->setCreatureInCell(x, y, player);
         } else {
-            area_->killCreatureInCell(x, y);
+            area_->removeCreatureInCell(x, y);
         }
     }
     aside_.clear();
 }
 
-std::unordered_map<int, bool> GameModel::countAliveCreatureInArea_() {
-    std::unordered_map<int, bool> res;
+std::set<std::shared_ptr<player::Player>> 
+GameModel::checkCreatureInArea_() const 
+{
+    std::set<std::shared_ptr<player::Player>> res;
     auto corner = area_->upperLeftCorner();
     auto limW = area_->width() + corner.first;
     auto limH = area_->height() + corner.second;
     for (auto y = corner.second; y < limH; ++y) {
         for (auto x = corner.first; x < limW; ++x) {
             if (area_->isCellAvailable(x, y)) {
-                auto&& cr = area_->getCreatureByCell(x, y);
-                if (cr.isAlive()) {
-                    res[cr.id()] = true;
+                if (area_->hasCreatureInCell(x, y)) {
+                    auto&& cr = area_->getCreatureByCell(x, y);
+                    res.emplace(cr.player());
                 }
             }
         }
@@ -300,31 +289,31 @@ void GameModel::restartModel_() {
 void GameModel::fireWinnerDeterminate_() {
     int evt = static_cast<int>(
         game_event::event_t::WINNER_DETERMINATE);
-    notify(evt, slf());   
+    notify(evt);   
 }
 
 void GameModel::fireThereWasDraw_() {
     int evt = static_cast<int>(
         game_event::event_t::DRAW_DETERMINATE);
-    notify(evt, slf());   
+    notify(evt);   
 }
 
 void GameModel::firePlayerBetsCreatures_() {
     int evt = static_cast<int>(
         game_event::event_t::PLAYER_BETS_CREATURES);
-    notify(evt, slf());   
+    notify(evt);   
 }
 
 void GameModel::fireGameModelCalculatedEr_() {
     int evt = static_cast<int>(
         game_event::event_t::GAME_MODEL_CALCULATED_ER);
-    notify(evt, slf());   
+    notify(evt);   
 }
 
 void GameModel::fireUserInputRequired() {
     int evt = static_cast<int>(
         game_event::event_t::USER_INPUT_REQUIRED);
-    notify(evt, slf());   
+    notify(evt);   
 }
 
 

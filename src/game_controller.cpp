@@ -22,23 +22,21 @@ GameController::GameController(
         std::shared_ptr<view::IDrawableComposite> view,
         std::shared_ptr<IUserInput> input,
         std::shared_ptr<sf::RenderWindow> window,
-        const std::unordered_map<int, sf::Color>& creatureColors):
+        const std::unordered_map<int, sf::Color>& playersCreatureColors,
+        const std::shared_ptr<IGameField> field):
     area_(std::move(area))
     , model_(model)
     , view_(view)
     , input_(input)
     , window_(window)
-    , creatureColors_(creatureColors)
+    , playersCreatureColors_(playersCreatureColors)
+    , field_(field)
 {}
 
-void GameController::update(
-    std::weak_ptr<subject::ISubject> subj, int event_t)
+void GameController::update(int event_t)
 {   
     using evt_t = game_event::event_t;
     auto evt = static_cast<evt_t>(event_t);
-    auto lk = subj.lock();
-    auto field = 
-        std::dynamic_pointer_cast<game_field::IGameField>(lk);
     switch (evt) {
         case evt_t::FIELD_CLEAR: {
             clearGridCanvas_();
@@ -46,13 +44,13 @@ void GameController::update(
             break;
         }
         case evt_t::CELL_CLEAR_IN_FIELD: {
-            auto [x, y] = field->lastAffectedCell();
+            auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
             redrawWindowNDisplay_();
             break;
         }
         case evt_t::CREATURE_KILL_IN_FIELD: {
-            auto [x, y] = field->lastAffectedCell();
+            auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
             if (gameModelSetupPhase_) {
                 redrawWindowNDisplay_();
@@ -60,7 +58,7 @@ void GameController::update(
             break;
         }
         case evt_t::CREATURE_REVIVE_IN_FIELD: {
-            auto [x, y] = field->lastAffectedCell();
+            auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
             if (gameModelSetupPhase_) {
                 redrawWindowNDisplay_();
@@ -70,7 +68,8 @@ void GameController::update(
         case evt_t::PLAYER_BETS_CREATURES: {
             auto id = model_->curPlayer();
             auto movesCount = model_->movesRemained();
-            notifyAboutPlayerParticipation_(id, movesCount);
+            auto p = model_->curPlayer();
+            notifyAboutPlayerParticipation_(p->name(), movesCount);
             gameModelSetupPhase_ = true;
             break;
         }
@@ -81,8 +80,8 @@ void GameController::update(
             break;
         }
         case evt_t::WINNER_DETERMINATE: {
-            auto id = model_->winnerPlayer();
-            notifyAboutWinner_(id);
+            auto p = model_->winnerPlayer();
+            notifyAboutWinner_(p->name());
             break;
         }
         case evt_t::DRAW_DETERMINATE: {
@@ -91,6 +90,14 @@ void GameController::update(
         }
         case evt_t::USER_INPUT_REQUIRED: {
             input_->readInput();
+            break;
+        }
+        case evt_t::USER_ASKED_SET_CREATURE: {
+            auto [suc, x, y] = input_->lastCoordInput();
+            if (suc) {
+                auto p = model_->curPlayer();
+                p->setCreature(x, y);
+            }
         }
     }
 }
@@ -135,20 +142,20 @@ void GameController::updateCellInGridCanvasInView_(int xidx, int yidx) {
     if (!area_->isCellAvailable(xidx, yidx)) {
         color = sf::Color::Black;
     } else {
-        auto&& cr = area_->getCreatureByCell(xidx, yidx);
-        if (cr.isAlive()) {
-            color = creatureColors_.at(cr.id());
+        if (area_->hasCreatureInCell(xidx, yidx)) {
+            auto&& cr = area_->getCreatureByCell(xidx, yidx);
+            color = playersCreatureColors_.at(cr.player()->id());
         } else {
-            color = creatureColors_.at(creature::idDead);
+            color = sf::Color::White;
         }
     }
     grid->paintCell({xidx, yidx}, color);
 } 
 
-void GameController::notifyAboutWinner_(int player) {
+void GameController::notifyAboutWinner_(const std::string& name) {
     std::stringstream ss;
     ss << "Won: ";
-    ss << player;
+    ss << name;
     ss << '!';
     setTextOnTextComp_(ss.str());
 }
@@ -157,12 +164,13 @@ void GameController::notifyAboutDraw_() {
     setTextOnTextComp_("Draw!");
 }
 
-void GameController::notifyAboutPlayerParticipation_(int player, int n) {
+void GameController::notifyAboutPlayerParticipation_(
+    const std::string& name, int moveRemained) {
     std::stringstream ss;
     ss << "Player: ";
-    ss << player;
+    ss << name;
     ss << ". Remaining creatures: ";
-    ss << n;
+    ss << moveRemained;
     ss << '.';
     setTextOnTextComp_(ss.str());
 }

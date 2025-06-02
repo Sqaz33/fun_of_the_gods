@@ -1,32 +1,24 @@
 #include "creature.hpp"
 
+#include "player.hpp"
+
 namespace creature {
 
-void Creature::kill() noexcept {
-    id_ = idDead;
-    isAlive_ = false;
+Creature::Creature(
+    std::shared_ptr<player::Player> player) :
+    player_(player) 
+{}
+
+std::shared_ptr<player::Player> Creature::player() {
+    return player_;
 }
 
-void Creature::revive(int id) noexcept {
-    id_ = id;
-    isAlive_ = true;
-}
-
-bool Creature::isAlive() const noexcept {
-    return isAlive_;
-}
-
-int Creature::id() const noexcept {
-    return id_;
+const std::shared_ptr<player::Player> Creature::player() const {
+    return player_;
 }
 
 bool Creature::operator<(const Creature& cr) {
-    return id_ < cr.id_;
-}
-
-int nextCreatureId() {
-    static int id = idDead;
-    return ++id;
+    return player_->id() < cr.player_->id();
 }
 
 } // namespace creature

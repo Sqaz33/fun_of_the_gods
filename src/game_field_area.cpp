@@ -34,18 +34,18 @@ bool GameFieldExcludedCellsArea::isCellAvailable(
            !field_->isExcludedCell(xidx, yidx);
 }
 
-void GameFieldExcludedCellsArea::reviveCreatureInCell(
-    int xidx, int yidx, int id) 
+void GameFieldExcludedCellsArea::setCreatureInCell(
+    int xidx, int yidx, std::shared_ptr<player::Player> player) 
 {
     verifyThenThrowCellPos_(xidx, yidx);
-    field_->reviveCreatureInCell(xidx, yidx, id);
+    field_->setCreatureInCell(xidx, yidx, player);
 }
 
-void GameFieldExcludedCellsArea::killCreatureInCell(
+void GameFieldExcludedCellsArea::removeCreatureInCell(
     int xidx, int yidx)
 {
     verifyThenThrowCellPos_(xidx, yidx);
-    field_->killCreatureInCell(xidx, yidx);
+    field_->removeCreatureInCell(xidx, yidx);
 }  
 
 const creature::ICreature& 
@@ -55,18 +55,22 @@ GameFieldExcludedCellsArea::getCreatureByCell(int xidx, int yidx) const
     return field_->getCreatureByCell(xidx, yidx);
 }
 
-void GameFieldExcludedCellsArea::clearCell(int xidx, int yidx)  
+bool GameFieldExcludedCellsArea::hasCreatureInCell(
+    int xidx, int yidx) const 
 {
     verifyThenThrowCellPos_(xidx, yidx);
-    field_->clearCell(xidx, yidx);
+    return field_->hasCreatureInCell(xidx, yidx);
 }
+
 
 void GameFieldExcludedCellsArea::clear() {
     if (width() == field_->width() && 
         height() == field_->height()) 
     { 
         field_->clear();
-    } else {
+    } 
+    else 
+    {
         for (int y = upperLeftCorner_.second; 
                 y <= lowerRightCorner_.second; ++y)
         {
@@ -74,7 +78,7 @@ void GameFieldExcludedCellsArea::clear() {
                 x <= lowerRightCorner_.second; ++x) 
             {   
                 if (!field_->isExcludedCell(x, y)) {
-                    field_->clearCell(x, y);
+                    field_->removeCreatureInCell(x, y);
                 }
             }
         }

@@ -37,6 +37,11 @@ struct ICell {
      * @param creat Unique pointer to the new ICreature object.
      */
     virtual void setCreature(std::unique_ptr<creature::ICreature> creat) = 0;
+
+    virtual bool hasCreature() const = 0;
+
+    virtual void removeCreature() = 0;
+
     
     /**
      * @brief Virtual destructor for proper polymorphic destruction.
@@ -73,6 +78,10 @@ public:
      *        If nullptr is passed, the current creature is removed.
      */
     void setCreature(std::unique_ptr<creature::ICreature> creat) override;
+
+    bool hasCreature() const override;
+
+    void removeCreature() override;
 
 private:
     std::unique_ptr<creature::ICreature> creat_; ///< Unique pointer to the contained creature

@@ -21,10 +21,10 @@ namespace factory {
  */
 struct ICreatureFactory {
     /**
-     * @brief Creates a new creature instance.
-     * @return std::unique_ptr<creature::ICreature> A unique pointer to the newly created creature.
+
      */
-    virtual std::unique_ptr<creature::ICreature> createCreature() const = 0;
+    virtual std::unique_ptr<creature::ICreature> createCreature(
+        std::shared_ptr<player::Player> player) const = 0;
     
     /**
      * @brief Virtual destructor for proper polymorphic destruction.
@@ -43,13 +43,10 @@ struct ICreatureFactory {
 class CreatureFactory : public ICreatureFactory {
 public:
     /**
-     * @brief Creates a new creature instance.
-     * @return std::unique_ptr<creature::ICreature> A unique pointer to the newly created creature.
-     * 
-     * @note The concrete type of the created creature depends on the implementation.
-     *       This method must be implemented in derived classes to create specific creature types.
+
      */
-    std::unique_ptr<creature::ICreature> createCreature() const override;
+    std::unique_ptr<creature::ICreature> createCreature(
+        std::shared_ptr<player::Player> player) const override;
 };
 
 } // namespace factory

@@ -7,19 +7,11 @@ namespace {
 } // namespace
 
 namespace player {
-    
-void Player::update(
-    std::weak_ptr<subject::ISubject> subj, int event_t) 
-{ 
-    auto evt = static_cast<game_event::event_t>(event_t);
-    if (game_event::event_t::USER_ASKED_SET_CREATURE == evt) {
-        auto lk = subj.lock();
-        auto input = 
-            std::dynamic_pointer_cast<user_input::IUserInput>(lk);
-        auto [suc, x, y] = input->lastCoordInput();
-        if (suc) tapOnCreature_(x, y);
-    }
-}
+
+Player::Player(int id, const std::string& name) : 
+    id_(id) 
+    , name_(name)    
+{}
 
 void Player::setFieldArea(
         std::unique_ptr<IGameFieldArea> area)
@@ -29,23 +21,30 @@ IGameFieldArea& Player::fieldArea(){
     return *area_;
 }
 
-void Player::setCreatId(int id) noexcept {
-    creatId_ = id;
+int Player::id() const noexcept {
+    return id_;
 }
 
-int Player::creatId() const noexcept {
-    return creatId_;
+const std::string& Player::name() const {
+    return name_;
 }
 
-void Player::tapOnCreature_(int x, int y) {
+void Player::setCreature(int x, int y) {
     if (area_->isCellAvailable(x, y)) {
-        auto&& cr = area_->getCreatureByCell(x, y);
-        if (cr.isAlive() && cr.id() == creatId_) {
-            area_->killCreatureInCell(x, y);
-        } else if (!cr.isAlive()) {
-            area_->reviveCreatureInCell(x, y, creatId_);
+        if (area_->hasCreatureInCell(x, y)) {
+            auto&& cr = area_->getCreatureByCell(x, y);
+            if (cr.player()->id() == id_) {
+                area_->removeCreatureInCell(x, y);
+            }
+        } else {
+            area_->setCreatureInCell(x, y, slf());
         }
     }
 }
+
+std::shared_ptr<Player> Player::slf() {
+    return shared_from_this();
+}
+
 
 } // namespace player

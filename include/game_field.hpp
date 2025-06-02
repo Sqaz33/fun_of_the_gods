@@ -19,6 +19,12 @@
 #include "creature_factory.hpp"
 #include "cell_factory.hpp"
 
+
+namespace player {
+    class Player;
+} // namespace player
+
+
 namespace game_field {
 
 /**
@@ -39,29 +45,28 @@ struct IGameField {
     virtual const creature::ICreature& getCreatureByCell(int xidx, int yidx) const = 0;
     
     /**
-     * @brief Revives a creature in the specified cell.
-     * @param xidx X coordinate of the cell
-     * @param yidx Y coordinate of the cell
-     * @param id Creature ID to revive
-     * @throws std::runtime_error if cell is out of bounds or excluded
+
      */
-    virtual void reviveCreatureInCell(int xidx, int yidx, int id) = 0;
+    virtual void setCreatureInCell(int xidx, int yidx, 
+                        std::shared_ptr<player::Player> player) = 0;
     
     /**
-     * @brief Kills the creature in the specified cell.
+     * @brief Remove the creature in the specified cell.
      * @param xidx X coordinate of the cell
      * @param yidx Y coordinate of the cell
      * @throws std::runtime_error if cell is out of bounds or excluded
      */
-    virtual void killCreatureInCell(int xidx, int yidx) = 0;
-    
+    virtual void removeCreatureInCell(int xidx, int yidx) = 0;
+
     /**
-     * @brief Clears the specified cell (removes any creature).
-     * @param xidx X coordinate of the cell
-     * @param yidx Y coordinate of the cell
-     * @throws std::runtime_error if cell is out of bounds or excluded
+     * @brief 
+     * 
+     * @param xidx 
+     * @param yidx 
+     * @return true 
+     * @return false 
      */
-    virtual void clearCell(int xidx, int yidx) = 0;
+    virtual bool hasCreatureInCell(int xidx, int yidx) const = 0;
     
     /**
      * @brief Clears all cells in the field.
@@ -123,16 +128,19 @@ public:
         std::unique_ptr<factory::ICreatureFactory> creatFactory,
         std::unique_ptr<factory::ICellFactory> cellFactory);
     
+public:
     // IGameField interface implementation
     const creature::ICreature& getCreatureByCell(int xidx, int yidx) const override;
-    void reviveCreatureInCell(int xidx, int yidx, int id) override;
-    void killCreatureInCell(int xidx, int yidx) override;
-    void clearCell(int xidx, int yidx) override;
+    void setCreatureInCell(int xidx, int yidx, 
+            std::shared_ptr<player::Player> player) override;
+    void removeCreatureInCell(int xidx, int yidx) override;
+    bool hasCreatureInCell(int xidx, int yidx) const override;
     void clear() override;
     std::pair<int, int> lastAffectedCell() const noexcept override;
     int width() const noexcept override;
     int height() const noexcept override;
 
+public:
     // Additional public methods
     /**
      * @brief Checks if a cell is excluded.
@@ -141,19 +149,13 @@ public:
      * @return true if cell is excluded, false otherwise
      */
     bool isExcludedCell(int xidx, int yidx) const;
-    
-    /**
-     * @brief Gets a shared pointer to this instance.
-     * @return shared_ptr to this field
-     */
-    std::shared_ptr<GameFieldExcludedCells> slf();
 
     // ISubject interface implementation
     void attach(std::shared_ptr<observer::IObserver> obs, int event_t) override;
     void detach(std::weak_ptr<observer::IObserver> obs, int event_t) override;
 
-protected:
-    void notify(int event_t, std::weak_ptr<ISubject> slf) override;
+private:
+    void notify(int event_t) override;
 
 private:
     /**
@@ -177,17 +179,12 @@ private:
     /**
      * @brief Notifies observers of creature revive event.
      */
-    void fireCreatureRevive_();
+    void fireCreatureSet_();
     
     /**
      * @brief Notifies observers of creature kill event.
      */
-    void fireCreatureKill_();
-    
-    /**
-     * @brief Prepares the field for use.
-     */
-    void prepareField_();
+    void fireCreatureRemove_();
     
     /**
      * @brief Initializes the field with specified dimensions.

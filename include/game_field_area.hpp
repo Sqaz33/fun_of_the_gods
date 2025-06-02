@@ -57,36 +57,27 @@ struct IGameFieldArea {
      * @param yidx Y coordinate of the cell
      * @param id Creature ID to revive
      */
-    virtual void reviveCreatureInCell(int xidx, int yidx, int id) = 0;
+    virtual void setCreatureInCell(int xidx, int yidx, 
+                std::shared_ptr<player::Player> player) = 0;
     
     /**
      * @brief Kills the creature in the specified cell.
      * @param xidx X coordinate of the cell
      * @param yidx Y coordinate of the cell
      */
-    virtual void killCreatureInCell(int xidx, int yidx) = 0;
-    
-    /**
-     * @brief Gets the creature in the specified cell.
-     * @param xidx X coordinate of the cell
-     * @param yidx Y coordinate of the cell
-     * @return const reference to the creature
-     * @throws std::runtime_error if cell is empty or out of bounds
-     */
+    virtual void removeCreatureInCell(int xidx, int yidx) = 0;
+
+    virtual bool hasCreatureInCell(int xidx, int yidx) const = 0;
+
     virtual const creature::ICreature& 
-        getCreatureByCell(int xidx, int yidx) const = 0; 
-    
-    /**
-     * @brief Clears the specified cell.
-     * @param xidx X coordinate of the cell
-     * @param yidx Y coordinate of the cell
-     */
-    virtual void clearCell(int xidx, int yidx) = 0;
+        getCreatureByCell(int xidx, int yidx) const = 0;
+
     
     /**
      * @brief Clears all cells in the area.
      */
     virtual void clear() = 0;
+    
     
     /**
      * @brief Gets the upper-left corner coordinates.
@@ -149,10 +140,11 @@ public:
     void lock() noexcept override;
     void unlock() noexcept override;
     bool isCellAvailable(int xidx, int yidx) const override;
-    void reviveCreatureInCell(int xidx, int yidx, int id) override;
-    void killCreatureInCell(int xidx, int yidx) override;
+    void setCreatureInCell(int xidx, int yidx, 
+            std::shared_ptr<player::Player> player) override;
+    void removeCreatureInCell(int xidx, int yidx) override;
+    bool hasCreatureInCell(int xidx, int yidx) const override;
     const ICreature& getCreatureByCell(int xidx, int yidx) const override;
-    void clearCell(int xidx, int yidx) override;
     void clear() override;
     std::pair<int, int> upperLeftCorner() const noexcept override;
     std::pair<int, int> lowerRightCorner() const noexcept override;

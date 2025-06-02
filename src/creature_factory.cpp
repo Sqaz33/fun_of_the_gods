@@ -3,7 +3,8 @@
 namespace factory {
     
 std::unique_ptr<creature::ICreature>
-CreatureFactory::createCreature() const
-{ return std::make_unique<creature::Creature>(); }
+CreatureFactory::createCreature(
+    std::shared_ptr<player::Player> player) const
+{ return std::make_unique<creature::Creature>(player); }
 
 } // namespace factory 

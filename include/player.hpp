@@ -10,6 +10,7 @@
 #define PLAYER_HPP
 
 #include <memory>
+#include <string>
 
 #include "user_input.hpp"
 #include "observer.hpp"
@@ -25,19 +26,11 @@ namespace player {
  * Implements the Observer pattern to respond to game events and manages
  * the player's assigned game field area and creature type.
  */
-class Player : public observer::IObserver {
+class Player : public std::enable_shared_from_this<Player> {
     using IGameFieldArea = game_field_area::IGameFieldArea;
 
 public:
-    /**
-     * @brief Handles update notifications from observed subjects.
-     * @param subj Weak pointer to the subject triggering the update
-     * @param event_t Type of event that occurred (from game_event::event_t)
-     * 
-     * Processes game events relevant to the player, particularly user input events
-     * for creature placement in the player's assigned area.
-     */
-    void update(std::weak_ptr<subject::ISubject> subj, int event_t) override;
+    Player(int id, const std::string& name);
  
 public:
     /**
@@ -53,32 +46,18 @@ public:
      */
     IGameFieldArea& fieldArea();
     
-    /**
-     * @brief Sets the player's creature type identifier.
-     * @param id Creature identifier to assign
-     */
-    void setCreatId(int id) noexcept;
-    
-    /**
-     * @brief Gets the player's creature type identifier.
-     * @return The creature identifier
-     */
-    int creatId() const noexcept;
+    int id() const noexcept;
 
-private:
-    /**
-     * @brief Handles creature placement at specified coordinates.
-     * @param x X coordinate in the game field
-     * @param y Y coordinate in the game field
-     * 
-     * Attempts to place the player's creature type at the specified location
-     * within their assigned game field area.
-     */
-    void tapOnCreature_(int x, int y);
+    const std::string& name() const;
+
+    void setCreature(int x, int y);
+
+    std::shared_ptr<Player> slf();
 
 private:   
     std::unique_ptr<IGameFieldArea> area_;  ///< Player's assigned game field area
-    int creatId_;                           ///< Player's creature type identifier
+    int id_;                                ///< Player's identifier
+    std::string name_;
 };
 
 } // namespace player

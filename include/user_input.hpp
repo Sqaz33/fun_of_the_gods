@@ -80,11 +80,6 @@ public:
     void readInput() override;
     std::tuple<bool, int, int> lastCoordInput() noexcept override;
 
-    /**
-     * @brief Gets a shared pointer to this instance.
-     * @return shared_ptr to this UserInput object
-     */
-    std::shared_ptr<UserInput> slf();
 
     // ISubject interface forwarding
     void attach(std::shared_ptr<observer::IObserver> obs, int event_t) override
@@ -94,8 +89,8 @@ public:
     { subject::ISubject::detach(obs, event_t); }
 
 protected:
-    void notify(int event_t, std::weak_ptr<ISubject> slf) override
-    { subject::ISubject::notify(event_t, slf); }
+    void notify(int event_t) override
+    { subject::ISubject::notify(event_t); }
 
 private:
     /**

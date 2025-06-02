@@ -59,26 +59,22 @@ void UserInput::computeCoord_(int x, int y) {
     }
 }
 
-std::shared_ptr<UserInput> UserInput::slf() {
-    return shared_from_this();
-}
-
 void UserInput::fireUserAskedClose_() {
     int evt = static_cast<int>(
         game_event::event_t::USER_ASKED_CLOSE);
-    notify(evt, slf());
+    notify(evt);
 } 
 
 void UserInput::fireUserAskedSetCreature_() {
     int evt = static_cast<int>(
         game_event::event_t::USER_ASKED_SET_CREATURE);
-    notify(evt, slf());
+    notify(evt);
 }
 
 void UserInput::fireUserAskedRestart_() {
     int evt = static_cast<int>(
         game_event::event_t::USER_ASKED_RESTART);
-    notify(evt, slf());
+    notify(evt);
 }
 
 } // namespace user_input
