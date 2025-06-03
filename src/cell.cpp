@@ -25,4 +25,29 @@ void Cell::removeCreature() {
     creat_.release();
 }
 
+
+
+void Cell::addNeighbors(const ICell* ne) {
+    neighbors_.push_back(ne);
+}
+
+std::map<const std::shared_ptr<player::Player>, int> 
+    Cell::countNeighborsCreatures() const 
+{   
+    std::map<const std::shared_ptr<player::Player>, int> res;
+    for (auto c : neighbors_) {
+        if (c->hasCreature()) {
+            auto&& cr = c->creature();;
+            auto it = res.find(cr.player());
+            if (it != res.end()) {
+                ++it->second;
+            } else {
+                res[cr.player()] = 1;
+            }
+        }
+    }
+    return res;
+}
+
+
 } // namespace cell

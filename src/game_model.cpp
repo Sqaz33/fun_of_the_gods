@@ -184,34 +184,6 @@ GameModel::computeEr_()
     return {true, false, nullptr};
 } 
 
-std::map<std::shared_ptr<player::Player>, int> 
-GameModel::countNeighbors_(int xidx, int yidx) const {
-    constexpr std::array<const std::pair<int, int>, 8> neighbors {{
-        {-1,  -1}, {0, -1}, {1, -1},
-        {-1,   0},          {1,  0},
-        {-1,   1}, {0,  1}, {1,  1}  
-    }};
-
-    std::map<std::shared_ptr<player::Player>, int> res;
-    for (auto&& d : neighbors) {
-        auto x = xidx + d.first;
-        auto y = yidx + d.second;
-        if (area_->isCellAvailable(x, y) && 
-            area_->hasCreatureInCell(x, y)) 
-        {
-            auto&& cr = area_->getCreatureByCell(x, y);
-            auto it = res.find(cr.player());
-            if (it != res.end()) {
-                ++it->second;
-            } else {
-                res[cr.player()] = 1;
-            }
-        }
-    }
-
-    return res;
-}
-
 void GameModel::computeAside_() {
     namespace views = std::ranges::views;
     auto luCorner = area_->upperLeftCorner();
@@ -220,7 +192,7 @@ void GameModel::computeAside_() {
     for (auto y = luCorner.second; y <= rdCorner.second; ++y) {
         for (auto x = luCorner.first; x <= rdCorner.first; ++x) {
             if (area_->isCellAvailable(x, y)) {
-                auto ne = countNeighbors_(x, y);
+                auto ne = area_->countCellNeighborsCreatures(x, y);
                 int neSum = std::accumulate(ne.begin(), ne.end(), 
                                 0, [] (int i, auto&& p) { return i + p.second; });
                 bool isAlive = area_->hasCreatureInCell(x, y);

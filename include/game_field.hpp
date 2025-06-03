@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <stdexcept>
+#include <array>
 
 #include "game_event.hpp"
 #include "subject.hpp"
@@ -67,6 +68,10 @@ struct IGameField {
      * @return false 
      */
     virtual bool hasCreatureInCell(int xidx, int yidx) const = 0;
+
+    virtual std::map<const std::shared_ptr<player::Player>, int> 
+        countCellNeighborsCreatures(int xidx, int yidx) const = 0;
+
     
     /**
      * @brief Clears all cells in the field.
@@ -135,6 +140,8 @@ public:
             std::shared_ptr<player::Player> player) override;
     void removeCreatureInCell(int xidx, int yidx) override;
     bool hasCreatureInCell(int xidx, int yidx) const override;
+    std::map<const std::shared_ptr<player::Player>, int> 
+        countCellNeighborsCreatures(int xidx, int yidx) const override;
     void clear() override;
     std::pair<int, int> lastAffectedCell() const noexcept override;
     int width() const noexcept override;
@@ -192,6 +199,8 @@ private:
      * @param height Field height
      */
     void initField_(int width, int height);
+
+    void initCells_();
     
 private:
     std::vector<std::vector<std::unique_ptr<cell::ICell>>> field_;    ///< 2D vector of cells
@@ -199,6 +208,13 @@ private:
     std::pair<int, int> lastAffectedCell_ = {-1, -1};                 ///< Last modified cell coordinates
     std::unique_ptr<factory::ICreatureFactory> creatFactory_;         ///< Creature factory
     std::unique_ptr<factory::ICellFactory> cellFactory_;              ///< Cell factory
+
+    static constexpr std::array<const std::pair<int, int>, 8> neighborsPos_ {{
+        {-1,  -1}, {0, -1}, {1, -1},
+        {-1,   0},          {1,  0},
+        {-1,   1}, {0,  1}, {1,  1}  
+    }};
+
 };
 
 } // namespace game_field

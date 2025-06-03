@@ -72,6 +72,8 @@ struct IGameFieldArea {
     virtual const creature::ICreature& 
         getCreatureByCell(int xidx, int yidx) const = 0;
 
+    virtual std::map<const std::shared_ptr<player::Player>, int> 
+        countCellNeighborsCreatures(int xidx, int yidx) const = 0;
     
     /**
      * @brief Clears all cells in the area.
@@ -145,6 +147,8 @@ public:
     void removeCreatureInCell(int xidx, int yidx) override;
     bool hasCreatureInCell(int xidx, int yidx) const override;
     const ICreature& getCreatureByCell(int xidx, int yidx) const override;
+    std::map<const std::shared_ptr<player::Player>, int> 
+        countCellNeighborsCreatures(int xidx, int yidx) const override;
     void clear() override;
     std::pair<int, int> upperLeftCorner() const noexcept override;
     std::pair<int, int> lowerRightCorner() const noexcept override;

@@ -55,13 +55,19 @@ GameFieldExcludedCellsArea::getCreatureByCell(int xidx, int yidx) const
     return field_->getCreatureByCell(xidx, yidx);
 }
 
+std::map<const std::shared_ptr<player::Player>, int> 
+GameFieldExcludedCellsArea::countCellNeighborsCreatures(int xidx, int yidx) const 
+{ 
+    verifyThenThrowCellPos_(xidx, yidx);
+    return field_->countCellNeighborsCreatures(xidx, yidx);
+}
+
 bool GameFieldExcludedCellsArea::hasCreatureInCell(
     int xidx, int yidx) const 
 {
     verifyThenThrowCellPos_(xidx, yidx);
     return field_->hasCreatureInCell(xidx, yidx);
 }
-
 
 void GameFieldExcludedCellsArea::clear() {
     if (width() == field_->width() && 

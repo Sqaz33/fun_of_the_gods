@@ -14,6 +14,7 @@ GameFieldExcludedCells::GameFieldExcludedCells(
     , cellFactory_(std::move(cellFactory))
 {   
     initField_(width, height); 
+    initCells_();
 }
 
 const creature::ICreature&
@@ -46,6 +47,12 @@ bool GameFieldExcludedCells::hasCreatureInCell(
 { 
     verifyThenThrowCellPos_(xidx, yidx);
     return field_.at(yidx).at(xidx)->hasCreature();
+}
+std::map<const std::shared_ptr<player::Player>, int> 
+GameFieldExcludedCells::countCellNeighborsCreatures(int xidx, int yidx) const 
+{ 
+    verifyThenThrowCellPos_(xidx, yidx);
+    return field_.at(yidx).at(xidx)->countNeighborsCreatures();
 }
 
 void GameFieldExcludedCells::clear() {
@@ -122,6 +129,25 @@ void GameFieldExcludedCells::initField_(int width, int height) {
             r.emplace_back(cellFactory_->createCell());
         }
         field_.emplace_back(std::move(r));
+    }
+}
+
+void GameFieldExcludedCells::initCells_() {
+    for (int i = 0; i < height(); ++i) {
+        for (int j = 0; j < width(); ++j) {
+            auto&& cell = field_[i][j];
+            for (auto [x, y] : neighborsPos_) {
+                y += i;
+                x += j;
+                if (!isExcludedCell(x, y) &&
+                    y >= 0 && y < height() &&
+                    x >= 0 && x < width()) 
+                { 
+                    auto&& ne = field_[y][x];
+                    cell->addNeighbors(ne.get());
+                }
+            }
+        }
     }
 }
 

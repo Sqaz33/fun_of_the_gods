@@ -7,6 +7,8 @@
 #define CELL_HPP
 
 #include <memory>
+#include <map>
+#include <vector>
 
 #include "creature.hpp"
 
@@ -42,7 +44,11 @@ struct ICell {
 
     virtual void removeCreature() = 0;
 
-    
+    virtual void addNeighbors(const ICell* ne) = 0;
+
+    virtual std::map<const std::shared_ptr<player::Player>, int> 
+        countNeighborsCreatures() const = 0;
+
     /**
      * @brief Virtual destructor for proper polymorphic destruction.
      */
@@ -83,8 +89,14 @@ public:
 
     void removeCreature() override;
 
+    void addNeighbors(const ICell* ne) override;
+
+    std::map<const std::shared_ptr<player::Player>, int> 
+        countNeighborsCreatures() const override;
+
 private:
     std::unique_ptr<creature::ICreature> creat_; ///< Unique pointer to the contained creature
+    std::vector<const ICell*> neighbors_;
 };
 
 } // namespace cell

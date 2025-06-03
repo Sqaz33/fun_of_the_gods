@@ -26,7 +26,6 @@ namespace creature {
 struct ICreature {
     /**
      */
-    virtual std::shared_ptr<player::Player> player() = 0;
     virtual const std::shared_ptr<player::Player> player() const = 0;
 
     /**
@@ -41,15 +40,9 @@ struct ICreature {
  */
 class Creature : public ICreature {
 public:
-    Creature(std::shared_ptr<player::Player> player); 
+    Creature(const std::shared_ptr<player::Player> player); 
 
 public:
-    /**
-     * @brief Gets the creature's current identifier.
-     * @return The active ID or idDead if the creature is dead.
-     */
-    std::shared_ptr<player::Player> player() override;
-
     const std::shared_ptr<player::Player> player() const override;
 
 public:
@@ -60,10 +53,10 @@ public:
      * 
      * @note Dead creatures (with idDead) are considered less than living ones.
      */
-    bool operator<(const Creature& cr);
+    bool operator<(const Creature& cr) const;
 
 private:
-    std::shared_ptr<player::Player> player_;
+    const std::shared_ptr<player::Player> player_;
 };
 
 } // namespace creature
