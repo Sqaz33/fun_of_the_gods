@@ -60,6 +60,7 @@ void GameFieldExcludedCells::clear() {
     int h = height();
     field_.clear();
     initField_(w, h);
+    initCells_();
     fireFieldClear_();
 }
 

@@ -68,6 +68,27 @@ bool GameFieldExcludedCellsArea::hasCreatureInCell(
     verifyThenThrowCellPos_(xidx, yidx);
     return field_->hasCreatureInCell(xidx, yidx);
 }
+std::set<std::shared_ptr<player::Player>> 
+    GameFieldExcludedCellsArea::checkCreatureInArea() const 
+{
+    std::set<std::shared_ptr<player::Player>> res;
+    auto corner = upperLeftCorner_;
+    for (auto y = corner.second; 
+        y <= lowerRightCorner_.second; ++y) 
+    {
+        for (auto x = corner.first; 
+            x <= lowerRightCorner_.first; ++x) 
+        {
+            if (isCellAvailable(x, y)) {
+                if (field_->hasCreatureInCell(x, y)) {
+                    auto&& cr = field_->getCreatureByCell(x, y);
+                    res.emplace(cr.player());
+                }
+            }
+        }
+    }
+    return res;
+}
 
 void GameFieldExcludedCellsArea::clear() {
     if (width() == field_->width() && 

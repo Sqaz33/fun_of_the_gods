@@ -177,12 +177,6 @@ public:
 private:
 #endif
     /**
-
-     */
-    std::map<std::shared_ptr<player::Player>, int> 
-        countNeighbors_(int xidx, int yidx) const;
-    
-    /**
      * @brief Computes next state changes without applying them.
      */
     void computeAside_();
@@ -191,12 +185,6 @@ private:
      * @brief Applies computed state changes and clears the aside buffer.
      */
     void applyNClearAside_();
-    
-    /**
-
-     */
-    std::set<std::shared_ptr<player::Player>> 
-        checkCreatureInArea_() const;
 
     /**
      * @brief Restarts the game model to initial state.

@@ -174,7 +174,7 @@ GameModel::computeEr_()
 {
     computeAside_();
     applyNClearAside_();
-    auto count = checkCreatureInArea_();
+    auto count = area_->checkCreatureInArea();
     if (count.size() < 2) {
         if (count.size() == 1) {
             return {false, true, *count.begin()};
@@ -232,26 +232,6 @@ void GameModel::applyNClearAside_() {
         }
     }
     aside_.clear();
-}
-
-std::set<std::shared_ptr<player::Player>> 
-GameModel::checkCreatureInArea_() const 
-{
-    std::set<std::shared_ptr<player::Player>> res;
-    auto corner = area_->upperLeftCorner();
-    auto limW = area_->width() + corner.first;
-    auto limH = area_->height() + corner.second;
-    for (auto y = corner.second; y < limH; ++y) {
-        for (auto x = corner.first; x < limW; ++x) {
-            if (area_->isCellAvailable(x, y)) {
-                if (area_->hasCreatureInCell(x, y)) {
-                    auto&& cr = area_->getCreatureByCell(x, y);
-                    res.emplace(cr.player());
-                }
-            }
-        }
-    }
-    return res;
 }
 
 void GameModel::restartModel_() {

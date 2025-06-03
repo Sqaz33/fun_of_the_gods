@@ -74,12 +74,14 @@ struct IGameFieldArea {
 
     virtual std::map<const std::shared_ptr<player::Player>, int> 
         countCellNeighborsCreatures(int xidx, int yidx) const = 0;
-    
+
+    virtual std::set<std::shared_ptr<player::Player>> 
+        checkCreatureInArea() const = 0;
+
     /**
      * @brief Clears all cells in the area.
      */
     virtual void clear() = 0;
-    
     
     /**
      * @brief Gets the upper-left corner coordinates.
@@ -149,6 +151,8 @@ public:
     const ICreature& getCreatureByCell(int xidx, int yidx) const override;
     std::map<const std::shared_ptr<player::Player>, int> 
         countCellNeighborsCreatures(int xidx, int yidx) const override;
+    std::set<std::shared_ptr<player::Player>> 
+        checkCreatureInArea() const override;
     void clear() override;
     std::pair<int, int> upperLeftCorner() const noexcept override;
     std::pair<int, int> lowerRightCorner() const noexcept override;
