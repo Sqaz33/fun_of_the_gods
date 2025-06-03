@@ -21,6 +21,7 @@ int main() try {
     using namespace view;
     using namespace player;
     using namespace game_event;
+    using namespace figure;
     
     constexpr float k = 0.8f;
 
@@ -46,12 +47,22 @@ int main() try {
         std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
+    
+    float w = fieldWidth;
+    float h = fieldHeight;
+    
+    auto figure = 
+#if 0
+        std::make_unique<Romb>(h / 2 - 0.5, w / 2 - 0.5);
+#else
+        std::make_unique<DummyFigure>();
+#endif
 
-    auto field = std::make_shared<GameFieldExcludedCells>(
+    auto field = std::make_shared<GameFieldWithFigure>(
                     fieldWidth, fieldHeight, 
-                    std::vector<std::pair<int, int>>(),
                     std::move(creatFactory),
-                    std::move(cellFactory)
+                    std::move(cellFactory),
+                    std::move(figure)
                 );
     // ###########################################################################
 
@@ -117,11 +128,11 @@ int main() try {
     }
 
     auto modelArea = 
-        std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
+        std::make_unique<GameFieldWithFigureArea>(field, ul, lr);
     modelArea->unlock();
     auto areaFactory = 
         std::make_unique<
-            GameFieldExcludedCellsAreaCurryFactory>(field);
+            GameFieldWithFigureAreaCurryFactory>(field);
     auto model = std::make_shared<GameModel>(
         K, N, T, 
         std::move(modelArea), 
@@ -135,7 +146,7 @@ int main() try {
     };
 
     auto controllerArea = 
-        std::make_unique<GameFieldExcludedCellsArea>(field, ul, lr);
+        std::make_unique<GameFieldWithFigureArea>(field, ul, lr);
     controllerArea->unlock();
     auto controller = std::make_shared<GameController>(
         std::move(controllerArea), 

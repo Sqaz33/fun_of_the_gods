@@ -10,10 +10,19 @@ namespace {
             a->height() != b->height()) return false;
         for (int y = 0; y < a->height(); ++y) {
             for (int x = 0; x < a->width(); ++x) {
+                if (a->hasCreatureInCell(x, y) != 
+                    b->hasCreatureInCell(x, y))
+                {
+                    return false;
+                }
+                if (!a->hasCreatureInCell(x, y)) {
+                    continue;
+                }
                 auto&& crA = a->getCreatureByCell(x, y);
                 auto&& crB = b->getCreatureByCell(x, y);
-                if (crB.isAlive() != crB.isAlive() || 
-                    crA.id() != crB.id()) return false;
+                if (crA.player() != crB.player()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -25,45 +34,49 @@ TEST(GameModelTest, SingleCreature) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
-
+    
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(1, 1, 1);
+    actualField->setCreatureInCell(1, 1, player[0]);
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {2, 2};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
 
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -75,46 +88,51 @@ TEST(GameModelTest, SingleNeighbor) {
     using namespace factory;
     using namespace game_model;
 
+    
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(1, 1, 1);
-    actualField->reviveCreatureInCell(0, 1, 1);
+    actualField->setCreatureInCell(1, 1, player[0]);
+    actualField->setCreatureInCell(0, 1, player[0]);
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {2, 2};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
 
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
     
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -126,52 +144,57 @@ TEST(GameModelTest, TwoNeighbors) {
     using namespace factory;
     using namespace game_model;
 
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(1, 1, 1);
-    actualField->reviveCreatureInCell(2, 1, 1);
-    actualField->reviveCreatureInCell(1, 2, 1);
+    actualField->setCreatureInCell(1, 1, player[0]);
+    actualField->setCreatureInCell(2, 1, player[0]);
+    actualField->setCreatureInCell(1, 2, player[0]);
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {2, 2};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
 
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
+
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
-    expectField->reviveCreatureInCell(1, 1, 1);
-    expectField->reviveCreatureInCell(2, 1, 1);
-    expectField->reviveCreatureInCell(1, 2, 1);
-    expectField->reviveCreatureInCell(2, 2, 1);
+    expectField->setCreatureInCell(1, 1, player[0]);
+    expectField->setCreatureInCell(2, 1, player[0]);
+    expectField->setCreatureInCell(1, 2, player[0]);
+    expectField->setCreatureInCell(2, 2, player[0]);
 
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -183,45 +206,49 @@ TEST(GameModelTest, SingleCellField) {
     using namespace factory;
     using namespace game_model;
 
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 1, 1,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(0, 0, 1);
+    actualField->setCreatureInCell(0, 0, player[0]);
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {0, 0};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
     
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
-    
+
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 1, 1,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
     ASSERT_TRUE(eqFields(actualField, expectField));
@@ -233,55 +260,59 @@ TEST(GameModelTest, Stable) {
     using namespace factory;
     using namespace game_model;
 
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 4, 4,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(1, 1, 1);
-    actualField->reviveCreatureInCell(2, 1, 1);
-    actualField->reviveCreatureInCell(1, 2, 1);
-    actualField->reviveCreatureInCell(2, 2, 1);
+    actualField->setCreatureInCell(1, 1, player[0]);
+    actualField->setCreatureInCell(2, 1, player[0]);
+    actualField->setCreatureInCell(1, 2, player[0]);
+    actualField->setCreatureInCell(2, 2, player[0]);
 
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {3, 3};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
     
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
     
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 4, 4,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
-    expectField->reviveCreatureInCell(1, 1, 1);
-    expectField->reviveCreatureInCell(2, 1, 1);
-    expectField->reviveCreatureInCell(1, 2, 1);
-    expectField->reviveCreatureInCell(2, 2, 1);
+    expectField->setCreatureInCell(1, 1, player[0]);
+    expectField->setCreatureInCell(2, 1, player[0]);
+    expectField->setCreatureInCell(1, 2, player[0]);
+    expectField->setCreatureInCell(2, 2, player[0]);
 
     ASSERT_TRUE(eqFields(actualField, expectField));
 }
@@ -292,56 +323,60 @@ TEST(GameModelTest, Glider) {
     using namespace factory;
     using namespace game_model;
 
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 5, 5,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(0, 2, 1);
-    actualField->reviveCreatureInCell(1, 3, 1);
-    actualField->reviveCreatureInCell(2, 1, 1);
-    actualField->reviveCreatureInCell(2, 2, 1);
-    actualField->reviveCreatureInCell(2, 3, 1);
+    actualField->setCreatureInCell(0, 2, player[0]);
+    actualField->setCreatureInCell(1, 3, player[0]);
+    actualField->setCreatureInCell(2, 1, player[0]);
+    actualField->setCreatureInCell(2, 2, player[0]);
+    actualField->setCreatureInCell(2, 3, player[0]);
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {4, 4};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
     
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
     
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 5, 5,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
-    expectField->reviveCreatureInCell(1, 1, 1);
-    expectField->reviveCreatureInCell(2, 2, 1);
-    expectField->reviveCreatureInCell(3, 2, 1);
-    expectField->reviveCreatureInCell(1, 3, 1);
-    expectField->reviveCreatureInCell(2, 3, 1);
+    expectField->setCreatureInCell(1, 1, player[0]);
+    expectField->setCreatureInCell(2, 2, player[0]);
+    expectField->setCreatureInCell(3, 2, player[0]);
+    expectField->setCreatureInCell(1, 3, player[0]);
+    expectField->setCreatureInCell(2, 3, player[0]);
 
     ASSERT_TRUE(eqFields(actualField, expectField));
 }
@@ -352,53 +387,57 @@ TEST(GameModelTest, Oscillator) {
     using namespace factory;
     using namespace game_model;
 
+    std::vector<std::shared_ptr<player::Player>> player;
+    player.emplace_back(new player::Player(1, "player"));
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
         = std::make_unique<CreatureFactory>();
     auto cellFactory =
         std::make_unique<CellFactory>();
     auto actualField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
     
-    actualField->reviveCreatureInCell(0, 1, 1);
-    actualField->reviveCreatureInCell(1, 1, 1);
-    actualField->reviveCreatureInCell(2, 1, 1);
+    actualField->setCreatureInCell(0, 1, player[0]);
+    actualField->setCreatureInCell(1, 1, player[0]);
+    actualField->setCreatureInCell(2, 1, player[0]);
 
 
     std::pair<int, int> lu {0, 0};
     std::pair<int, int> rl {2, 2};
     auto area = std::make_unique<
-                GameFieldExcludedCellsArea>(actualField, lu, rl);
+                GameFieldWithFigureArea>(actualField, lu, rl);
     area->unlock();
     
     auto f = 
         std::make_unique<
-            factory::GameFieldExcludedCellsAreaCurryFactory>(actualField);
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player);
+            factory::GameFieldWithFigureAreaCurryFactory>(actualField);
     GameModel model(0, 0, 0, std::move(area), std::move(f), player);
     model.computeEr_();
 
     
+    figure = 
+        std::make_unique<figure::DummyFigure>();
     creatureFactory 
         = std::make_unique<CreatureFactory>();
     cellFactory =
         std::make_unique<CellFactory>();
     auto expectField 
-        = std::make_shared<GameFieldExcludedCells>(
+        = std::make_shared<GameFieldWithFigure>(
                 3, 3,
-                std::vector<std::pair<int, int>>(),
                 std::move(creatureFactory),
-                std::move(cellFactory)
+                std::move(cellFactory),
+                std::move(figure)
             );
 
-    expectField->reviveCreatureInCell(1, 0, 1);
-    expectField->reviveCreatureInCell(1, 1, 1);
-    expectField->reviveCreatureInCell(1, 2, 1);
+    expectField->setCreatureInCell(1, 0, player[0]);
+    expectField->setCreatureInCell(1, 1, player[0]);
+    expectField->setCreatureInCell(1, 2, player[0]);
 
     ASSERT_TRUE(eqFields(actualField, expectField));
 }

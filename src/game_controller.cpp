@@ -31,7 +31,7 @@ GameController::GameController(
     , window_(window)
     , playersCreatureColors_(playersCreatureColors)
     , field_(field)
-{}
+{ drawCanvasBackground_(); }
 
 void GameController::update(int event_t)
 {   
@@ -134,6 +134,7 @@ GameController::getCanvasComp_()
 
 void GameController::clearGridCanvas_() {
     getCanvasComp_()->clear();
+    drawCanvasBackground_();
 }
 
 void GameController::updateCellInGridCanvasInView_(int xidx, int yidx) {
@@ -199,5 +200,21 @@ void GameController::setTextOnTextComp_(const std::string& txt) {
             "The view is missing the DrawableText component");
     }
 }
+
+void GameController::drawCanvasBackground_() {
+    auto grid = getCanvasComp_();
+    for (int y = 0; y < area_->height(); ++y) {
+        for (int x = 0; x < area_->width(); ++x) {
+            sf::Color color;
+            if (area_->isCellAvailable(x, y)) {
+                color = sf::Color::White;
+            } else {
+                color = sf::Color::Black;
+            }
+            grid->paintCell({x, y}, color);
+        }
+    }
+}
+
 
 } // namespace game_controller

@@ -44,20 +44,20 @@ struct IGameFieldAreaCurryFactory {
  * @brief Factory that creates game field areas while respecting excluded cells.
  * 
  * This implementation creates areas that honor the exclusion patterns
- * defined in the GameFieldExcludedCells configuration.
+ * defined in the GameFieldWithFigure configuration.
  */
-class GameFieldExcludedCellsAreaCurryFactory : 
+class GameFieldWithFigureAreaCurryFactory : 
     public IGameFieldAreaCurryFactory
 {
-    using GameFieldExcludedCells = game_field::GameFieldExcludedCells;
+    using GameFieldWithFigure = game_field::GameFieldWithFigure;
 
 public:
     /**
      * @brief Constructs a factory with excluded cells configuration.
      * @param field Shared pointer to excluded cells configuration
      */
-    GameFieldExcludedCellsAreaCurryFactory(
-        std::shared_ptr<GameFieldExcludedCells> field);
+    GameFieldWithFigureAreaCurryFactory(
+        std::shared_ptr<GameFieldWithFigure> field);
 
     /**
      * @brief Creates a new game field area within bounds, respecting exclusions.
@@ -66,7 +66,7 @@ public:
      * @return std::unique_ptr<IGameFieldArea> New area respecting excluded cells
      * 
      * @note The created area will not include any cells marked as excluded
-     *       in the GameFieldExcludedCells configuration.
+     *       in the GameFieldWithFigure configuration.
      */
     std::unique_ptr<game_field_area::IGameFieldArea>
     createArea(
@@ -74,7 +74,7 @@ public:
         std::pair<int, int> lowerRightCorner) override;
 
 private:
-    std::shared_ptr<GameFieldExcludedCells> field_; ///< Excluded cells configuration
+    std::shared_ptr<GameFieldWithFigure> field_; ///< Excluded cells configuration
 };
 
 } // namespace factory

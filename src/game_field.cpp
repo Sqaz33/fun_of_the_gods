@@ -4,26 +4,27 @@
 
 namespace game_field {
 
-GameFieldExcludedCells::GameFieldExcludedCells(
+GameFieldWithFigure::GameFieldWithFigure(
         int width, int height, 
-        const std::vector<std::pair<int, int>>& excludedCells,
         std::unique_ptr<factory::ICreatureFactory> creatFactory,
-        std::unique_ptr<factory::ICellFactory> cellFactory) :
-    excludedCells_(excludedCells.begin(), excludedCells.end())
-    , creatFactory_(std::move(creatFactory))
+        std::unique_ptr<factory::ICellFactory> cellFactory,
+        std::unique_ptr<IFigure> figure) :
+    creatFactory_(std::move(creatFactory))
     , cellFactory_(std::move(cellFactory))
+    , figure_(std::move(figure))
+    
 {   
     initField_(width, height); 
     initCells_();
 }
 
 const creature::ICreature&
-GameFieldExcludedCells::getCreatureByCell(int xidx, int yidx) const {
+GameFieldWithFigure::getCreatureByCell(int xidx, int yidx) const {
     verifyThenThrowCellPos_(xidx, yidx);
     return field_.at(yidx).at(xidx)->creature();
 }
 
-void GameFieldExcludedCells::setCreatureInCell(int xidx, int yidx, 
+void GameFieldWithFigure::setCreatureInCell(int xidx, int yidx, 
     std::shared_ptr<player::Player> player)
 {   
     verifyThenThrowCellPos_(xidx, yidx);
@@ -33,7 +34,7 @@ void GameFieldExcludedCells::setCreatureInCell(int xidx, int yidx,
     fireCreatureSet_();
 }
 
-void GameFieldExcludedCells::removeCreatureInCell(
+void GameFieldWithFigure::removeCreatureInCell(
     int xidx, int yidx)
 { 
     verifyThenThrowCellPos_(xidx, yidx);
@@ -42,20 +43,20 @@ void GameFieldExcludedCells::removeCreatureInCell(
     fireCreatureRemove_();
 }
 
-bool GameFieldExcludedCells::hasCreatureInCell(
+bool GameFieldWithFigure::hasCreatureInCell(
     int xidx, int yidx) const 
 { 
     verifyThenThrowCellPos_(xidx, yidx);
     return field_.at(yidx).at(xidx)->hasCreature();
 }
 std::map<const std::shared_ptr<player::Player>, int> 
-GameFieldExcludedCells::countCellNeighborsCreatures(int xidx, int yidx) const 
+GameFieldWithFigure::countCellNeighborsCreatures(int xidx, int yidx) const 
 { 
     verifyThenThrowCellPos_(xidx, yidx);
     return field_.at(yidx).at(xidx)->countNeighborsCreatures();
 }
 
-void GameFieldExcludedCells::clear() {
+void GameFieldWithFigure::clear() {
     int w = width();
     int h = height();
     field_.clear();
@@ -65,32 +66,32 @@ void GameFieldExcludedCells::clear() {
 }
 
 std::pair<int, int> 
-GameFieldExcludedCells::lastAffectedCell() const noexcept
+GameFieldWithFigure::lastAffectedCell() const noexcept
 { return lastAffectedCell_; }
 
-int GameFieldExcludedCells::width() const noexcept 
+int GameFieldWithFigure::width() const noexcept 
 { return field_.back().size(); }
 
-int GameFieldExcludedCells::height() const noexcept 
+int GameFieldWithFigure::height() const noexcept 
 { return field_.size(); }
 
-bool GameFieldExcludedCells::isExcludedCell(
+bool GameFieldWithFigure::isExcludedCell(
     int xidx, int yidx) const 
-{ return excludedCells_.contains({xidx, yidx}); }
+{ return !figure_->isPointInFigure(xidx, yidx); }
 
-void GameFieldExcludedCells::attach(
+void GameFieldWithFigure::attach(
     std::shared_ptr<observer::IObserver> obs, int event_t)
 { ISubject::attach(obs, event_t); }
 
-void GameFieldExcludedCells::detach(
+void GameFieldWithFigure::detach(
     std::weak_ptr<observer::IObserver> obs, int event_t)
 { ISubject::detach(obs, event_t); }
 
-void GameFieldExcludedCells::notify(int event_t) {
+void GameFieldWithFigure::notify(int event_t) {
     ISubject::notify(event_t);
 }
 
-void GameFieldExcludedCells::verifyThenThrowCellPos_(
+void GameFieldWithFigure::verifyThenThrowCellPos_(
     int xidx, int yidx) const 
 {
     if (isExcludedCell(xidx, yidx)) {
@@ -98,31 +99,31 @@ void GameFieldExcludedCells::verifyThenThrowCellPos_(
     }
 }
 
-void GameFieldExcludedCells::fireFieldClear_() {
+void GameFieldWithFigure::fireFieldClear_() {
     int evt = static_cast<int>(
         game_event::event_t::FIELD_CLEAR);   
     notify(evt);
 }
 
-void GameFieldExcludedCells::fireCellClear_() {
+void GameFieldWithFigure::fireCellClear_() {
     int evt = static_cast<int>(
         game_event::event_t::CELL_CLEAR_IN_FIELD);   
     notify(evt);
 }
 
-void GameFieldExcludedCells::fireCreatureSet_() {
+void GameFieldWithFigure::fireCreatureSet_() {
     int evt = static_cast<int>(
         game_event::event_t::CREATURE_REVIVE_IN_FIELD);   
     notify(evt);
 }
 
-void GameFieldExcludedCells::fireCreatureRemove_() {
+void GameFieldWithFigure::fireCreatureRemove_() {
     int evt = static_cast<int>(
             game_event::event_t::CREATURE_KILL_IN_FIELD);   
     notify(evt);
 }
 
-void GameFieldExcludedCells::initField_(int width, int height) {
+void GameFieldWithFigure::initField_(int width, int height) {
     field_ = decltype(field_)();
     for (int i = 0; i < height; ++i) {
         std::vector<std::unique_ptr<cell::ICell>> r;
@@ -133,7 +134,7 @@ void GameFieldExcludedCells::initField_(int width, int height) {
     }
 }
 
-void GameFieldExcludedCells::initCells_() {
+void GameFieldWithFigure::initCells_() {
     for (int i = 0; i < height(); ++i) {
         for (int j = 0; j < width(); ++j) {
             auto&& cell = field_[i][j];

@@ -135,6 +135,8 @@ private:
      */
     void setTextOnTextComp_(const std::string& txt);
 
+    void drawCanvasBackground_();
+
 private:
     // Component dependencies
     std::unique_ptr<IGameFieldArea> area_;          ///< Game field data and logic

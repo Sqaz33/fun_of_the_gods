@@ -19,6 +19,7 @@
 #include "subject.hpp"
 #include "creature_factory.hpp"
 #include "cell_factory.hpp"
+#include "figure.hpp"
 
 
 namespace player {
@@ -103,35 +104,30 @@ struct IGameField {
 };
 
 /**
- * @class GameFieldExcludedCells
+ * @class GameFieldWithFigure
  * @brief Game field implementation with excluded cells support.
  * 
  * Implements a game field with configurable excluded cells where creatures
  * cannot be placed. Implements both ISubject and IGameField interfaces.
  */
-class GameFieldExcludedCells :
+class GameFieldWithFigure :
     public IGameField,
-    public std::enable_shared_from_this<GameFieldExcludedCells>,
+    public std::enable_shared_from_this<GameFieldWithFigure>,
     public subject::ISubject
 {
 private:
     using ISubject = subject::ISubject;
     using ICreatureFactory = factory::ICreatureFactory;
+    using IFigure = figure::IFigure;
 
 public:
     /**
-     * @brief Constructs a game field with excluded cells.
-     * @param width Field width in cells
-     * @param height Field height in cells
-     * @param excludedCells Vector of (x,y) coordinates of excluded cells
-     * @param creatFactory Factory for creating creatures
-     * @param cellFactory Factory for creating cells 
      */
-    GameFieldExcludedCells(
+    GameFieldWithFigure(
         int width, int height,
-        const std::vector<std::pair<int, int>>& excludedCells,
         std::unique_ptr<factory::ICreatureFactory> creatFactory,
-        std::unique_ptr<factory::ICellFactory> cellFactory);
+        std::unique_ptr<factory::ICellFactory> cellFactory,
+        std::unique_ptr<IFigure> figure);
     
 public:
     // IGameField interface implementation
@@ -204,10 +200,10 @@ private:
     
 private:
     std::vector<std::vector<std::unique_ptr<cell::ICell>>> field_;    ///< 2D vector of cells
-    std::set<std::pair<int, int>> excludedCells_;                     ///< Set of excluded cell coordinates
     std::pair<int, int> lastAffectedCell_ = {-1, -1};                 ///< Last modified cell coordinates
     std::unique_ptr<factory::ICreatureFactory> creatFactory_;         ///< Creature factory
     std::unique_ptr<factory::ICellFactory> cellFactory_;              ///< Cell factory
+    std::unique_ptr<IFigure> figure_;
 
     static constexpr std::array<const std::pair<int, int>, 8> neighborsPos_ {{
         {-1,  -1}, {0, -1}, {1, -1},

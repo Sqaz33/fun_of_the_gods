@@ -11,22 +11,22 @@ bool IGameFieldArea::isCellAvailable(
            yidx <= lowerRightCorner_.second;
 }
 
-GameFieldExcludedCellsArea::GameFieldExcludedCellsArea(
-    std::shared_ptr<GameFieldExcludedCells> field,
+GameFieldWithFigureArea::GameFieldWithFigureArea(
+    std::shared_ptr<GameFieldWithFigure> field,
     std::pair<int, int> upperLeftCorner, 
     std::pair<int, int> lowerRightCorner) :
     IGameFieldArea(upperLeftCorner, lowerRightCorner)
 { field_ = field; }
 
-void GameFieldExcludedCellsArea::lock() noexcept {
+void GameFieldWithFigureArea::lock() noexcept {
     isLocked_ = true;
 }
 
-void GameFieldExcludedCellsArea::unlock() noexcept {
+void GameFieldWithFigureArea::unlock() noexcept {
     isLocked_ = false;
 }
 
-bool GameFieldExcludedCellsArea::isCellAvailable(
+bool GameFieldWithFigureArea::isCellAvailable(
     int xidx, int yidx) const
 {
     return IGameFieldArea::isCellAvailable(xidx, yidx) && 
@@ -34,14 +34,14 @@ bool GameFieldExcludedCellsArea::isCellAvailable(
            !field_->isExcludedCell(xidx, yidx);
 }
 
-void GameFieldExcludedCellsArea::setCreatureInCell(
+void GameFieldWithFigureArea::setCreatureInCell(
     int xidx, int yidx, std::shared_ptr<player::Player> player) 
 {
     verifyThenThrowCellPos_(xidx, yidx);
     field_->setCreatureInCell(xidx, yidx, player);
 }
 
-void GameFieldExcludedCellsArea::removeCreatureInCell(
+void GameFieldWithFigureArea::removeCreatureInCell(
     int xidx, int yidx)
 {
     verifyThenThrowCellPos_(xidx, yidx);
@@ -49,27 +49,27 @@ void GameFieldExcludedCellsArea::removeCreatureInCell(
 }  
 
 const creature::ICreature& 
-GameFieldExcludedCellsArea::getCreatureByCell(int xidx, int yidx) const 
+GameFieldWithFigureArea::getCreatureByCell(int xidx, int yidx) const 
 {
     verifyThenThrowCellPos_(xidx, yidx);
     return field_->getCreatureByCell(xidx, yidx);
 }
 
 std::map<const std::shared_ptr<player::Player>, int> 
-GameFieldExcludedCellsArea::countCellNeighborsCreatures(int xidx, int yidx) const 
+GameFieldWithFigureArea::countCellNeighborsCreatures(int xidx, int yidx) const 
 { 
     verifyThenThrowCellPos_(xidx, yidx);
     return field_->countCellNeighborsCreatures(xidx, yidx);
 }
 
-bool GameFieldExcludedCellsArea::hasCreatureInCell(
+bool GameFieldWithFigureArea::hasCreatureInCell(
     int xidx, int yidx) const 
 {
     verifyThenThrowCellPos_(xidx, yidx);
     return field_->hasCreatureInCell(xidx, yidx);
 }
 std::set<std::shared_ptr<player::Player>> 
-    GameFieldExcludedCellsArea::checkCreatureInArea() const 
+    GameFieldWithFigureArea::checkCreatureInArea() const 
 {
     std::set<std::shared_ptr<player::Player>> res;
     auto corner = upperLeftCorner_;
@@ -90,7 +90,7 @@ std::set<std::shared_ptr<player::Player>>
     return res;
 }
 
-void GameFieldExcludedCellsArea::clear() {
+void GameFieldWithFigureArea::clear() {
     if (width() == field_->width() && 
         height() == field_->height()) 
     { 
@@ -113,26 +113,26 @@ void GameFieldExcludedCellsArea::clear() {
 }
 
 std::pair<int, int> 
-GameFieldExcludedCellsArea::upperLeftCorner() const noexcept 
+GameFieldWithFigureArea::upperLeftCorner() const noexcept 
 { return upperLeftCorner_; }
 
 std::pair<int, int> 
-GameFieldExcludedCellsArea::lowerRightCorner() const noexcept 
+GameFieldWithFigureArea::lowerRightCorner() const noexcept 
 { return lowerRightCorner_; }
 
-int GameFieldExcludedCellsArea::width() const noexcept {
+int GameFieldWithFigureArea::width() const noexcept {
     return lowerRightCorner_.first 
             - upperLeftCorner_.first
             + 1;
 }
 
-int GameFieldExcludedCellsArea::height() const noexcept  {
+int GameFieldWithFigureArea::height() const noexcept  {
     return lowerRightCorner_.second
             - upperLeftCorner_.second 
             + 1;
 }
 
-void GameFieldExcludedCellsArea::verifyThenThrowCellPos_(
+void GameFieldWithFigureArea::verifyThenThrowCellPos_(
     int xidx, int yidx) const {
     if (!isCellAvailable(xidx, yidx)) {
         throw std::logic_error("Accessing a forbidden cell.");

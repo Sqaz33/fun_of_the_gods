@@ -118,14 +118,14 @@ protected:
 };
 
 /**
- * @class GameFieldExcludedCellsArea
+ * @class GameFieldWithFigureArea
  * @brief Implementation of IGameFieldArea that respects excluded cells.
  * 
  * Manages a rectangular area of the game field while honoring a configuration
  * of excluded cells where creatures cannot be placed.
  */
-class GameFieldExcludedCellsArea : public IGameFieldArea {
-    using GameFieldExcludedCells = game_field::GameFieldExcludedCells;
+class GameFieldWithFigureArea : public IGameFieldArea {
+    using GameFieldWithFigure = game_field::GameFieldWithFigure;
     using ICreature = creature::ICreature;
     
 public:
@@ -135,8 +135,8 @@ public:
      * @param upperLeftCorner Coordinates of the upper-left corner (x,y)
      * @param lowerRightCorner Coordinates of the lower-right corner (x,y)
      */
-    GameFieldExcludedCellsArea(
-        std::shared_ptr<GameFieldExcludedCells> field,
+    GameFieldWithFigureArea(
+        std::shared_ptr<GameFieldWithFigure> field,
         std::pair<int, int> upperLeftCorner, 
         std::pair<int, int> lowerRightCorner);
 
@@ -170,7 +170,7 @@ private:
 
 private:
     bool isLocked_ = true; ///< Thread-safety lock flag
-    std::shared_ptr<GameFieldExcludedCells> field_; ///< Excluded cells configuration
+    std::shared_ptr<GameFieldWithFigure> field_; ///< Excluded cells configuration
 };
 
 } // namespace game_field_area

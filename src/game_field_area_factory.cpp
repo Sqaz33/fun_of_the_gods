@@ -1,25 +1,25 @@
 #include "game_field_area_factory.hpp"
 
 namespace {
-    using GameFieldExcludedCells = 
-        game_field::GameFieldExcludedCells;
+    using GameFieldWithFigure = 
+        game_field::GameFieldWithFigure;
 } // namespace
 
 namespace factory {
 
-GameFieldExcludedCellsAreaCurryFactory::
-    GameFieldExcludedCellsAreaCurryFactory(
-        std::shared_ptr<GameFieldExcludedCells> field):
+GameFieldWithFigureAreaCurryFactory::
+    GameFieldWithFigureAreaCurryFactory(
+        std::shared_ptr<GameFieldWithFigure> field):
     field_(field)
 {}
 
 std::unique_ptr<game_field_area::IGameFieldArea>
-GameFieldExcludedCellsAreaCurryFactory::createArea(
+GameFieldWithFigureAreaCurryFactory::createArea(
     std::pair<int, int> upperLeftCorner, 
     std::pair<int, int> lowerRightCorner)
 {       
     return std::make_unique<
-        game_field_area::GameFieldExcludedCellsArea>(
+        game_field_area::GameFieldWithFigureArea>(
         field_,
         upperLeftCorner,
         lowerRightCorner);
