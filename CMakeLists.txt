@@ -31,5 +31,20 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     "${FONT_FILE}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SFML_LIB}/bin/sfml-audio-3.dll"
+        "${SFML_LIB}/bin/sfml-audio-d-3.dll"
+        "${SFML_LIB}/bin/sfml-graphics-d-3.dll"
+        "${SFML_LIB}/bin/sfml-graphics-3.dll"
+        "${SFML_LIB}/bin/sfml-network-3.dll"
+        "${SFML_LIB}/bin/sfml-network-d-3.dll"
+        "${SFML_LIB}/bin/sfml-system-3.dll"
+        "${SFML_LIB}/bin/sfml-system-d-3.dll"
+        "${SFML_LIB}/bin/sfml-window-d-3.dll"
+        "${SFML_LIB}/bin/sfml-window-3.dll"
+        "$<TARGET_FILE_DIR:tst>"
+)
+
 enable_testing()
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/test")
