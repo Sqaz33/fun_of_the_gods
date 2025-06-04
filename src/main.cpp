@@ -171,9 +171,9 @@ int main() try {
     field->attach(controller, 
         static_cast<int>(event_t::CELL_CLEAR_IN_FIELD));
     field->attach(controller, 
-        static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
+        static_cast<int>(event_t::CREATURE_REMOVE_IN_FIELD));
     field->attach(controller, 
-        static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
+        static_cast<int>(event_t::CREATURE_SET_IN_FIELD));
     model->attach(controller, 
         static_cast<int>(event_t::PLAYER_BETS_CREATURES));
     model->attach(controller,
@@ -193,9 +193,9 @@ int main() try {
     input->attach(model, 
         static_cast<int>(event_t::USER_ASKED_RESTART));
     field->attach(model, 
-        static_cast<int>(event_t::CREATURE_KILL_IN_FIELD));
+        static_cast<int>(event_t::CREATURE_REMOVE_IN_FIELD));
     field->attach(model, 
-        static_cast<int>(event_t::CREATURE_REVIVE_IN_FIELD));
+        static_cast<int>(event_t::CREATURE_SET_IN_FIELD));
     /////////////////////////////////////////////////////////////////
 
     controller->game();

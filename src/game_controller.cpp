@@ -49,7 +49,7 @@ void GameController::update(int event_t)
             redrawWindowNDisplay_();
             break;
         }
-        case evt_t::CREATURE_KILL_IN_FIELD: {
+        case evt_t::CREATURE_REMOVE_IN_FIELD: {
             auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
             if (gameModelSetupPhase_) {
@@ -57,7 +57,7 @@ void GameController::update(int event_t)
             }
             break;
         }
-        case evt_t::CREATURE_REVIVE_IN_FIELD: {
+        case evt_t::CREATURE_SET_IN_FIELD: {
             auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
             if (gameModelSetupPhase_) {

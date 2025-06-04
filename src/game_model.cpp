@@ -67,13 +67,13 @@ void GameModel::update(int event_t)
             restartModel_();
             break;
         }
-        case evt_t::CREATURE_KILL_IN_FIELD: {
+        case evt_t::CREATURE_REMOVE_IN_FIELD: {
             if (setupPhase_) {
                 ++curPlayerCreatNumber_;
             }   
             break;
         }
-        case evt_t::CREATURE_REVIVE_IN_FIELD: { 
+        case evt_t::CREATURE_SET_IN_FIELD: { 
             if (setupPhase_) {
                 --curPlayerCreatNumber_;
             }

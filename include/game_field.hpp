@@ -175,11 +175,6 @@ private:
     void fireFieldClear_();
     
     /**
-     * @brief Notifies observers of cell clear event.
-     */
-    void fireCellClear_();
-    
-    /**
      * @brief Notifies observers of creature revive event.
      */
     void fireCreatureSet_();

@@ -105,21 +105,15 @@ void GameFieldWithFigure::fireFieldClear_() {
     notify(evt);
 }
 
-void GameFieldWithFigure::fireCellClear_() {
-    int evt = static_cast<int>(
-        game_event::event_t::CELL_CLEAR_IN_FIELD);   
-    notify(evt);
-}
-
 void GameFieldWithFigure::fireCreatureSet_() {
     int evt = static_cast<int>(
-        game_event::event_t::CREATURE_REVIVE_IN_FIELD);   
+        game_event::event_t::CREATURE_SET_IN_FIELD);   
     notify(evt);
 }
 
 void GameFieldWithFigure::fireCreatureRemove_() {
     int evt = static_cast<int>(
-            game_event::event_t::CREATURE_KILL_IN_FIELD);   
+            game_event::event_t::CREATURE_REMOVE_IN_FIELD);   
     notify(evt);
 }
 

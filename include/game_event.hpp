@@ -36,12 +36,12 @@ enum class event_t : int {
     /**
      * @brief A creature has been killed/removed from the field.
      */
-    CREATURE_KILL_IN_FIELD,
+    CREATURE_REMOVE_IN_FIELD,
     
     /**
      * @brief A creature has been revived/added to the field.
      */
-    CREATURE_REVIVE_IN_FIELD,
+    CREATURE_SET_IN_FIELD,
     
     /**
      * @brief User requested to close/exit the game.
