@@ -39,9 +39,7 @@ GameModel::GameModel(
     , players_(players)
     , creatStrategy_(std::move(creatStrategy))
 {
-#ifndef TEST
     giveAreasForTwoPlayers_();
-#endif
 }
 
 void GameModel::attach(

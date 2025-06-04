@@ -29,14 +29,20 @@ namespace {
     }
 }
 
+// #################################################################################################
+// GameModel field handling tests
+// #################################################################################################
 TEST(GameModelTest, SingleCreature) {
     using namespace game_field;
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
     
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -62,7 +68,9 @@ TEST(GameModelTest, SingleCreature) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
     figure = 
@@ -87,10 +95,13 @@ TEST(GameModelTest, SingleNeighbor) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
     
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -117,7 +128,9 @@ TEST(GameModelTest, SingleNeighbor) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
     
@@ -143,9 +156,12 @@ TEST(GameModelTest, TwoNeighbors) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -173,7 +189,9 @@ TEST(GameModelTest, TwoNeighbors) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
 
@@ -205,9 +223,13 @@ TEST(GameModelTest, SingleCellField) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -233,7 +255,9 @@ TEST(GameModelTest, SingleCellField) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
 
@@ -259,9 +283,12 @@ TEST(GameModelTest, Stable) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -291,7 +318,9 @@ TEST(GameModelTest, Stable) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
     
@@ -322,9 +351,12 @@ TEST(GameModelTest, Glider) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -354,7 +386,9 @@ TEST(GameModelTest, Glider) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
     
@@ -386,9 +420,12 @@ TEST(GameModelTest, Oscillator) {
     using namespace game_field_area;
     using namespace factory;
     using namespace game_model;
+    using namespace creature_strategy;
 
-    std::vector<std::shared_ptr<player::Player>> player;
-    player.emplace_back(new player::Player(1, "player"));
+    std::vector<std::shared_ptr<player::Player>> player { 
+        std::make_shared<player::Player>(1, "player1"), 
+        std::make_shared<player::Player>(2, "player2"),  
+    };
     auto figure = 
         std::make_unique<figure::DummyFigure>();
     auto creatureFactory 
@@ -417,7 +454,9 @@ TEST(GameModelTest, Oscillator) {
     auto f = 
         std::make_unique<
             factory::GameFieldWithFigureAreaCurryFactory>(actualField);
-    GameModel model(0, 0, 0, std::move(area), std::move(f), player);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
+    GameModel model(0, 0, 0, std::move(area), std::move(f), player, std::move(creatStrategy));
     model.computeEr_();
 
     
@@ -441,6 +480,10 @@ TEST(GameModelTest, Oscillator) {
 
     ASSERT_TRUE(eqFields(actualField, expectField));
 }
+
+// #################################################################################################
+// player interaction tests
+// #################################################################################################
 
 
 int main(int argc, char* argv[]) {
