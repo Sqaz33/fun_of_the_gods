@@ -1,6 +1,6 @@
 # Процесс Сборки
 
-1. Перейти в диск C.
+1. Перейти в корень диска C.
 2. git clone https://github.com/microsoft/vcpkg.git
 3. cd vcpkg
 4. .\bootstrap-vcpkg.sh
