@@ -96,7 +96,7 @@ void GameController::update(int event_t)
             auto [suc, x, y] = input_->lastCoordInput();
             if (suc) {
                 auto p = model_->curPlayer();
-                p->setCreature(x, y);
+                p->tapOnCreature(x, y);
             }
         }
     }

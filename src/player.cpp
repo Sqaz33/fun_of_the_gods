@@ -29,7 +29,7 @@ const std::string& Player::name() const {
     return name_;
 }
 
-void Player::setCreature(int x, int y) {
+void Player::tapOnCreature(int x, int y) {
     if (area_->isCellAvailable(x, y)) {
         if (area_->hasCreatureInCell(x, y)) {
             auto&& cr = area_->getCreatureByCell(x, y);

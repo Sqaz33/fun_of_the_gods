@@ -50,7 +50,7 @@ public:
 
     const std::string& name() const;
 
-    void setCreature(int x, int y);
+    void tapOnCreature(int x, int y);
 
     std::shared_ptr<Player> slf();
 

@@ -485,6 +485,149 @@ TEST(GameModelTest, Oscillator) {
 // player interaction tests
 // #################################################################################################
 
+TEST(PlayerInteractionsTest, SingleCreatureSet) {
+    using namespace game_field;
+    using namespace game_field_area;
+    using namespace factory;
+    using namespace game_model;
+    using namespace creature_strategy;
+    using namespace player;
+
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
+    auto creatureFactory 
+        = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
+    auto field 
+        = std::make_shared<GameFieldWithFigure>(
+                3, 3,
+                std::move(creatureFactory),
+                std::move(cellFactory),
+                std::move(figure)
+            );
+    std::pair<int, int> lu {0, 0};
+    std::pair<int, int> rl {2, 2};
+    auto area = 
+        std::make_unique<GameFieldWithFigureArea>(field, lu, rl);
+    auto player = std::make_shared<Player>(1, "p1");
+    player->setFieldArea(std::move(area));
+    player->fieldArea().unlock();
+    player->tapOnCreature(1, 1);
+
+    ASSERT_TRUE(field->hasCreatureInCell(1, 1));
+    auto&& creat = field->getCreatureByCell(1, 1);
+    ASSERT_TRUE(creat.player() == player);
+}
+
+TEST(PlayerInteractionsTest, SingleCreatureSetWithLockArea) {
+    using namespace game_field;
+    using namespace game_field_area;
+    using namespace factory;
+    using namespace game_model;
+    using namespace creature_strategy;
+    using namespace player;
+
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
+    auto creatureFactory 
+        = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
+    auto field 
+        = std::make_shared<GameFieldWithFigure>(
+                3, 3,
+                std::move(creatureFactory),
+                std::move(cellFactory),
+                std::move(figure)
+            );
+    std::pair<int, int> lu {0, 0};
+    std::pair<int, int> rl {2, 2};
+    auto area = 
+        std::make_unique<GameFieldWithFigureArea>(field, lu, rl);
+    auto player = std::make_shared<Player>(1, "p1");
+    player->setFieldArea(std::move(area));
+    player->tapOnCreature(1, 1);
+
+    ASSERT_TRUE(!field->hasCreatureInCell(1, 1));
+}
+
+TEST(PlayerInteractionsTest, SingleCreatureSetAndRemove) {
+    using namespace game_field;
+    using namespace game_field_area;
+    using namespace factory;
+    using namespace game_model;
+    using namespace creature_strategy;
+    using namespace player;
+
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
+    auto creatureFactory 
+        = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
+    auto field 
+        = std::make_shared<GameFieldWithFigure>(
+                3, 3,
+                std::move(creatureFactory),
+                std::move(cellFactory),
+                std::move(figure)
+            );
+    std::pair<int, int> lu {0, 0};
+    std::pair<int, int> rl {2, 2};
+    auto area = 
+        std::make_unique<GameFieldWithFigureArea>(field, lu, rl);
+    auto player = std::make_shared<Player>(1, "p1");
+    player->setFieldArea(std::move(area));
+    player->fieldArea().unlock();
+    player->tapOnCreature(1, 1);
+
+    ASSERT_TRUE(field->hasCreatureInCell(1, 1));
+    auto&& creat = field->getCreatureByCell(1, 1);
+    ASSERT_TRUE(creat.player() == player);
+
+    player->tapOnCreature(1, 1);
+    ASSERT_TRUE(!field->hasCreatureInCell(1, 1));
+}
+
+
+TEST(PlayerInteractionsTest, SingleCreatureSetAndRemoveLockArea) {
+    using namespace game_field;
+    using namespace game_field_area;
+    using namespace factory;
+    using namespace game_model;
+    using namespace creature_strategy;
+    using namespace player;
+
+    auto figure = 
+        std::make_unique<figure::DummyFigure>();
+    auto creatureFactory 
+        = std::make_unique<CreatureFactory>();
+    auto cellFactory =
+        std::make_unique<CellFactory>();
+    auto field 
+        = std::make_shared<GameFieldWithFigure>(
+                3, 3,
+                std::move(creatureFactory),
+                std::move(cellFactory),
+                std::move(figure)
+            );
+    std::pair<int, int> lu {0, 0};
+    std::pair<int, int> rl {2, 2};
+    auto area = 
+        std::make_unique<GameFieldWithFigureArea>(field, lu, rl);
+    auto player = std::make_shared<Player>(1, "p1");
+    player->setFieldArea(std::move(area));
+    player->tapOnCreature(1, 1);
+    ASSERT_TRUE(!field->hasCreatureInCell(1, 1));
+
+    player->tapOnCreature(1, 1);
+    ASSERT_TRUE(!field->hasCreatureInCell(1, 1));
+}
+
+
+
+
 
 
 int main(int argc, char* argv[]) {
