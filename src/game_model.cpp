@@ -14,10 +14,11 @@ namespace {
     using IGameFieldArea = game_field_area::IGameFieldArea;
     using IGameFieldAreaCurryFactory = factory::IGameFieldAreaCurryFactory;
 
-
+    
     bool computeLiveStatusConwayGame(bool isAlive, int neighborsCount) {
         return (neighborsCount == 2 && isAlive) || neighborsCount == 3;
     }
+
 } // namespace 
 
 namespace game_model {
@@ -28,13 +29,15 @@ GameModel::GameModel(
         int erCount,
         std::unique_ptr<IGameFieldArea> area, 
         std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory,
-        const std::vector<std::shared_ptr<player::Player>>& players):
+        const std::vector<std::shared_ptr<player::Player>>& players,
+        std::unique_ptr<ICreatureStrategy> creatStrategy) :
     creatNumberFirstTime_(creatNumberFirstTime)
     , creatNumber_(creatNumber)
     , erCount_(erCount)
     , area_(std::move(area))
     , areaFactory_(std::move(areaFactory))
     , players_(players)
+    , creatStrategy_(std::move(creatStrategy))
 {
 #ifndef TEST
     giveAreasForTwoPlayers_();
@@ -196,7 +199,7 @@ void GameModel::computeAside_() {
                 int neSum = std::accumulate(ne.begin(), ne.end(), 
                                 0, [] (int i, auto&& p) { return i + p.second; });
                 bool isAlive = area_->hasCreatureInCell(x, y);
-                if (computeLiveStatusConwayGame(isAlive, neSum)) {
+                if (creatStrategy_->computeLiveStatus(neSum, isAlive)) {
                     if (!isAlive) {
                         auto max = std::max_element(ne.begin(), ne.end(), 
                                                     [] (auto&& l, auto&& p) 

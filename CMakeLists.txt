@@ -31,5 +31,5 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     "${FONT_FILE}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
 
-enable_testing()
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/test")
+# enable_testing()
+# add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/test")

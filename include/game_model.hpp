@@ -21,6 +21,7 @@
 #include "game_field_area.hpp"
 #include "observer.hpp"
 #include "player.hpp"
+#include "creature_strategy.hpp"
 
 namespace game_model {
 
@@ -83,6 +84,7 @@ class GameModel :
 {
     using IGameFieldArea = game_field_area::IGameFieldArea;
     using IGameFieldAreaCurryFactory = factory::IGameFieldAreaCurryFactory;
+    using ICreatureStrategy = creature_strategy::ICreatureStrategy;
 
 public:
     /**
@@ -100,7 +102,8 @@ public:
         int erCount,
         std::unique_ptr<IGameFieldArea> area, 
         std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory,
-        const std::vector<std::shared_ptr<player::Player>>& players);
+        const std::vector<std::shared_ptr<player::Player>>& players,
+        std::unique_ptr<ICreatureStrategy> creatStrategy);
     
 public: 
     /**
@@ -205,6 +208,7 @@ private:
     const int erCount_;                                       ///< ER calculations per turn
     std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory_; ///< Area factory
     std::unique_ptr<IGameFieldArea> area_;                    ///< Game field area being modeled
+    std::unique_ptr<ICreatureStrategy> creatStrategy_;
     
     // Computation state
     std::vector<

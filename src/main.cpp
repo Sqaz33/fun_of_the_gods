@@ -22,6 +22,7 @@ int main() try {
     using namespace player;
     using namespace game_event;
     using namespace figure;
+    using namespace creature_strategy;
     
     constexpr float k = 0.8f;
 
@@ -52,7 +53,7 @@ int main() try {
     float h = fieldHeight;
     
     auto figure = 
-#if 0
+#if 1
         std::make_unique<Romb>(h / 2 - 0.5, w / 2 - 0.5);
 #else
         std::make_unique<DummyFigure>();
@@ -133,11 +134,14 @@ int main() try {
     auto areaFactory = 
         std::make_unique<
             GameFieldWithFigureAreaCurryFactory>(field);
+    auto creatStrategy =
+        std::make_unique<ConwayCreatureStrategy>();
     auto model = std::make_shared<GameModel>(
         K, N, T, 
         std::move(modelArea), 
         std::move(areaFactory), 
-        players);
+        players,
+        std::move(creatStrategy));
 
     std::unordered_map<int, sf::Color> crColors { 
         {-1, sf::Color::White}, 
