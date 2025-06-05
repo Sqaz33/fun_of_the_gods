@@ -173,8 +173,11 @@ void GameModel::computeErs_(int erCount) {
 std::tuple<bool, bool, std::shared_ptr<player::Player>> 
 GameModel::computeEr_() 
 {
+    // рассчитать состояние поля в следующий момент и отложить его
     computeAside_();
+    // применить отложенное состояние на поле
     applyNClearAside_();
+    // получить всех список игроков, чьи существа еще есть на поле
     auto count = area_->checkCreatureInArea();
     if (count.size() < 2) {
         if (count.size() == 1) {
@@ -194,29 +197,41 @@ void GameModel::computeAside_() {
         for (auto x = luCorner.first; x <= rdCorner.first; ++x) {
             if (area_->isCellAvailable(x, y)) {
                 auto ne = area_->countCellNeighborsCreatures(x, y);
+                // посчитать количество существ всех игроков в соседях
                 int neSum = std::accumulate(ne.begin(), ne.end(), 
                                 0, [] (int i, auto&& p) { return i + p.second; });
+                // если существо есть в клетке - оно живо
                 bool isAlive = area_->hasCreatureInCell(x, y);
+
+                // принять решение через стратегию 
                 if (creatStrategy_->computeLiveStatus(neSum, isAlive)) {
                     if (!isAlive) {
+                        // получить значение с максимальным количеством существ 
                         auto max = std::max_element(ne.begin(), ne.end(), 
                                                     [] (auto&& l, auto&& p) 
                                                     { return l.second < p.second; });
+                        // получить все максимумы 
                         auto matchingMax = ne | 
                             views::filter([&max](auto&& v) 
                                     { return v.second == max->second; });
+                        // получить количество максимумов
                         auto szMax = std::distance(matchingMax.begin(), 
                                                     matchingMax.end());
+                        // получить случайный максимум из равных
                         std::random_device r;
                         std::default_random_engine e1(r());
                         std::uniform_int_distribution<int> uniform_dist(0, szMax - 1);
                         int mean = uniform_dist(e1);
                         auto resMax = matchingMax.begin();
                         std::advance(resMax, mean);
+                        // получить игрока из максимума
                         auto player = resMax->first;
+
+                        // поставить существо (даже если оно там уже есть)
                         aside_.emplace_back(player, true, x, y);
                     }
                 } else if (isAlive) {
+                    // удалить существо (даже если его нет в клетке)
                     aside_.emplace_back(nullptr, false, x, y);
                 }
             }

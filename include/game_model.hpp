@@ -21,7 +21,7 @@ struct IGameModel {
     virtual std::shared_ptr<player::Player> winnerPlayer() const noexcept = 0;
     virtual int movesRemained() const noexcept = 0;
     virtual int erRemained() const noexcept = 0;
-    
+
     virtual ~IGameModel() = default;
 };
 
@@ -96,8 +96,10 @@ private:
     std::unique_ptr<IGameFieldArea> area_;                    
     std::unique_ptr<ICreatureStrategy> creatStrategy_;
     
+    // deferred field changes
     std::vector<
         std::tuple< std::shared_ptr<player::Player>, bool, int, int>> aside_;
+        
     std::vector<std::shared_ptr<player::Player>> players_; 
 
     bool roundIsOver_ = false;            

@@ -22,6 +22,7 @@ public:
     IGameFieldArea& fieldArea();
     int id() const noexcept;
     const std::string& name() const;
+    // the method puts or removes the player's creature
     void tapOnCreature(int x, int y);
     std::shared_ptr<Player> slf();
 
