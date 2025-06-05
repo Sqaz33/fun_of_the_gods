@@ -43,7 +43,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "${SFML_LIB}/bin/sfml-system-d-3.dll"
         "${SFML_LIB}/bin/sfml-window-d-3.dll"
         "${SFML_LIB}/bin/sfml-window-3.dll"
-        "$<TARGET_FILE_DIR:tst>"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
 
 enable_testing()
