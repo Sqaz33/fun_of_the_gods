@@ -7,9 +7,7 @@ struct ICreatureStrategy {
     virtual bool computeLiveStatus(int neighborsCount, bool isAlive) = 0; 
 };
 
-class ConwayCreatureStrategy :
-    public ICreatureStrategy
-{
+class ConwayCreatureStrategy : public ICreatureStrategy {
 public:
     bool computeLiveStatus(int neighborsCount, bool isAlive) override;
 };

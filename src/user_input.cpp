@@ -42,6 +42,15 @@ void UserInput::readInput() {
     }
 }
 
+void UserInput::attach(std::shared_ptr<observer::IObserver> obs, int event_t) 
+{ subject::ISubject::attach(obs, event_t); }
+
+void UserInput::detach(std::weak_ptr<observer::IObserver> obs, int event_t) 
+{ subject::ISubject::detach(obs, event_t); }
+
+void UserInput::notify(int event_t) 
+{ subject::ISubject::notify(event_t); }
+
 std::tuple<bool, int, int> UserInput::lastCoordInput() noexcept {
     return lastCoordInput_;
 }

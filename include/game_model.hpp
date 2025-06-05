@@ -1,13 +1,3 @@
-/**
- * @file game_model.hpp
- * @brief Header file for the game model interfaces and implementations.
- * 
- * Defines the game model interface and implementation for computing
- * game state transitions and determining game outcomes. The model follows
- * the observer pattern to notify about state changes and implements
- * core game logic including creature interactions and win conditions.
- */
-
 #ifndef GAME_MODEL_HPP
 #define GAME_MODEL_HPP
 
@@ -25,57 +15,16 @@
 
 namespace game_model {
 
-/**
- * @interface IGameModel
- * @brief Interface for game models that compute game state transitions.
- * 
- * Provides the basic operation for computing one iteration of the game model
- * and accessing current game state information.
- */
 struct IGameModel {
-    /**
-     * @brief Executes one full game iteration (round/turn).
-     */
     virtual void game() = 0;
-
-    /**
-     * @brief Gets the current active player ID.
-     * @return ID of the current player (0 or 1 typically)
-     */
     virtual std::shared_ptr<player::Player> curPlayer() const noexcept = 0;
-    
-    /**
-     * @brief Gets the winner player ID if game has concluded.
-     * @return ID of the winning player, or undefined if game not over
-     */
     virtual std::shared_ptr<player::Player> winnerPlayer() const noexcept = 0;
-
-    /**
-     * @brief Gets remaining moves in current turn/phase.
-     * @return Number of moves remaining
-     */
     virtual int movesRemained() const noexcept = 0;
-
-    /**
-     * @brief Gets remaining expected result calculations.
-     * @return Number of ER calculations remaining
-     */
     virtual int erRemained() const noexcept = 0;
     
-    /**
-     * @brief Virtual destructor for polymorphic behavior.
-     */
     virtual ~IGameModel() = default;
 };
 
-/**
- * @class GameModel
- * @brief Concrete implementation of the game model.
- * 
- * Implements game logic for computing creature interactions and determining
- * game outcomes based on the current state of the game field area. Acts as
- * both observer and subject in the observer pattern.
- */
 class GameModel : 
     public IGameModel,
     public observer::IObserver,
@@ -87,15 +36,6 @@ class GameModel :
     using ICreatureStrategy = creature_strategy::ICreatureStrategy;
 
 public:
-    /**
-     * @brief Constructs a new GameModel instance.
-     * @param creatNumberFirstTime Initial number of creatures per player
-     * @param creatNumber Regular number of creatures per player
-     * @param erCount Number of expected result calculations per turn
-     * @param area Game field area implementation
-     * @param areaFactory Factory for creating game field areas
-     * @param players List of player instances
-     */
     GameModel(
         int creatNumberFirstTime,
         int creatNumber,
@@ -106,34 +46,18 @@ public:
         std::unique_ptr<ICreatureStrategy> creatStrategy);
     
 public: 
-    /**
-     * @brief Attaches an observer to a specific event type.
-     * @param obs Observer to attach
-     * @param event_t Event type to observe
-     */
     void attach(
         std::shared_ptr<observer::IObserver> obs, int event_t) override;
-
-    /**
-     * @brief Detaches an observer from a specific event type.
-     * @param obs Observer to detach (weak reference)
-     * @param event_t Event type to stop observing
-     */
     void detach(
         std::weak_ptr<observer::IObserver> obs, int event_t) override;
 
 private:
-    /**
-     */
     void notify(int event_t) override;
 
 public:
-    /**
-     */
     void update(int event_t) override;
 
 public:
-    // IGameModel interface implementation
     void game() override;
     std::shared_ptr<player::Player> curPlayer() const noexcept override;
     std::shared_ptr<player::Player> winnerPlayer() const noexcept override;
@@ -141,60 +65,23 @@ public:
     int erRemained() const noexcept override;
 
 private:
-    // Game setup methods
-    /**
-     * @brief Distributes game areas to the two players.
-     */
     void giveAreasForTwoPlayers_();
-    
-    /**
-     * @brief Sets up the initial game field.
-     * @param N Size of the field to setup
-     */
     void setupField_(int N);
-    
-    /**
-     * @brief Sets up the field for a specific player.
-     * @param N Size of the field
-     * @param player Player number (0 or 1)
-     */
     void setupFieldForPlayer_(int creatureNumber, 
             std::shared_ptr<player::Player> player);
-
-    /**
-     * @brief Computes initial expected results.
-     * @param erCount Number of ER calculations to perform
-     */
     void computeErs_(int erCount);
 #ifdef TEST
 public:
 #endif
-    // Model compute methods
-    /**
-
-     */
     std::tuple<bool, bool, std::shared_ptr<player::Player>> 
         computeEr_();
 
 #ifdef TEST
 private:
 #endif
-    /**
-     * @brief Computes next state changes without applying them.
-     */
     void computeAside_();
-    
-    /**
-     * @brief Applies computed state changes and clears the aside buffer.
-     */
     void applyNClearAside_();
-
-    /**
-     * @brief Restarts the game model to initial state.
-     */
     void restartModel_();
-
-    // Event firing methods
     void fireWinnerDeterminate_();
     void fireThereWasDraw_();
     void firePlayerBetsCreatures_();
@@ -202,30 +89,26 @@ private:
     void fireUserInputRequired();
 
 private:
-    // Configuration
-    const int creatNumberFirstTime_;                          ///< Initial creature count per player
-    const int creatNumber_;                                   ///< Regular creature count per player
-    const int erCount_;                                       ///< ER calculations per turn
-    std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory_; ///< Area factory
-    std::unique_ptr<IGameFieldArea> area_;                    ///< Game field area being modeled
+    const int creatNumberFirstTime_;                          
+    const int creatNumber_;                                   
+    const int erCount_;                                       
+    std::unique_ptr<IGameFieldAreaCurryFactory> areaFactory_; 
+    std::unique_ptr<IGameFieldArea> area_;                    
     std::unique_ptr<ICreatureStrategy> creatStrategy_;
     
-    // Computation state
     std::vector<
-        std::tuple< std::shared_ptr<player::Player>, bool, int, int>> aside_;   ///< State transition buffer
-    std::vector<std::shared_ptr<player::Player>> players_; ///< List of players
+        std::tuple< std::shared_ptr<player::Player>, bool, int, int>> aside_;
+    std::vector<std::shared_ptr<player::Player>> players_; 
 
-    // Game state
-    bool roundIsOver_ = false;            ///< Whether winner is determined
-    bool askedRestart_ = false;           ///< Whether restart was requested
-    bool askedClose_ = false;             ///< Whether close was requested
-    bool setupPhase_ = false;             ///< Whether in setup phase
+    bool roundIsOver_ = false;            
+    bool askedRestart_ = false;           
+    bool askedClose_ = false;             
+    bool setupPhase_ = false;             
     
-    // Player state
-    std::shared_ptr<player::Player> curPlayer_;          ///< Current active player ID
-    std::shared_ptr<player::Player> winnerPlayer_;       ///< Winning player ID if game over
-    int curPlayerCreatNumber_;                           ///< Current player's creature count
-    int erRemained_;                                     ///< Remaining ER calculations
+    std::shared_ptr<player::Player> curPlayer_;          
+    std::shared_ptr<player::Player> winnerPlayer_;       
+    int curPlayerCreatNumber_;                           
+    int erRemained_;                                     
 };
 
 } // namespace game_model

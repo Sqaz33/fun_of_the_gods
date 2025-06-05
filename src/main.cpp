@@ -169,8 +169,6 @@ int main() try {
     field->attach(controller, 
         static_cast<int>(event_t::FIELD_CLEAR));
     field->attach(controller, 
-        static_cast<int>(event_t::CELL_CLEAR_IN_FIELD));
-    field->attach(controller, 
         static_cast<int>(event_t::CREATURE_REMOVE_IN_FIELD));
     field->attach(controller, 
         static_cast<int>(event_t::CREATURE_SET_IN_FIELD));

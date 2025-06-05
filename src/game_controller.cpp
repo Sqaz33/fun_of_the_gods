@@ -43,12 +43,6 @@ void GameController::update(int event_t)
             redrawWindowNDisplay_();
             break;
         }
-        case evt_t::CELL_CLEAR_IN_FIELD: {
-            auto [x, y] = field_->lastAffectedCell();
-            updateCellInGridCanvasInView_(x, y);
-            redrawWindowNDisplay_();
-            break;
-        }
         case evt_t::CREATURE_REMOVE_IN_FIELD: {
             auto [x, y] = field_->lastAffectedCell();
             updateCellInGridCanvasInView_(x, y);
