@@ -10,6 +10,7 @@
 #include "cell.hpp"
 #include "creature.hpp"
 #include "player.hpp"
+#include "point_of_expansion.hpp"
 
 int main() try {
     using namespace game_field;
@@ -59,7 +60,13 @@ int main() try {
         std::make_unique<DummyFigure>();
 #endif
 
-    auto field = std::make_shared<GameFieldWithFigure>(
+    auto field = std::make_shared<
+#if 0
+        GameFieldWithFigure
+#else
+        GamefieldWithFigureAndTriangularNeighbors
+#endif
+    >(
                     fieldWidth, fieldHeight, 
                     std::move(creatFactory),
                     std::move(cellFactory),
