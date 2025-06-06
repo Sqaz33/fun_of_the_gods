@@ -1,4 +1,4 @@
-# Процесс Сборки
+# Процесс Сборки Проекта
 
 1. Перейти в корень диска C.
 2. git clone https://github.com/microsoft/vcpkg.git

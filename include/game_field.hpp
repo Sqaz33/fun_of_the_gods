@@ -82,6 +82,7 @@ private:
     void fireCreatureRemove_();
     void initField_(int width, int height);
     void initCells_();
+    std::pair<int, int> clampToSphere_(int x, int y) const;
     
 private:
     std::vector<std::vector<std::unique_ptr<cell::ICell>>> field_;

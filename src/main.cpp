@@ -53,7 +53,7 @@ int main() try {
     float h = fieldHeight;
     
     auto figure = 
-#if 1
+#if 0
         std::make_unique<Romb>(h / 2 - 0.5, w / 2 - 0.5);
 #else
         std::make_unique<DummyFigure>();

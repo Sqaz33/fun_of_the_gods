@@ -128,6 +128,20 @@ void GameFieldWithFigure::initField_(int width, int height) {
     }
 }
 
+std::pair<int, int>GameFieldWithFigure::clampToSphere_(int x, int y) const {
+    int n_x = x;
+    int n_y = y;
+
+    if (x < 0) n_x = width() - 1;
+    else if (x >= width()) n_x = 0;
+
+    if (y < 0) n_y = height() - 1;
+    else if (y >= height()) n_y = 0;
+
+    return {n_x, n_y};
+}
+
+
 void GameFieldWithFigure::initCells_() {
     for (int i = 0; i < height(); ++i) {
         for (int j = 0; j < width(); ++j) {
@@ -135,11 +149,22 @@ void GameFieldWithFigure::initCells_() {
             for (auto [x, y] : neighborsPos_) {
                 y += i;
                 x += j;
+#ifndef TEST
+                auto clamp = clampToSphere_(x, y);
+                int clampX = clamp.first;
+                int clampY = clamp.second;
+                if (!isExcludedCell(clampX, clampY)) 
+#else           
                 if (!isExcludedCell(x, y) &&
                     y >= 0 && y < height() &&
                     x >= 0 && x < width()) 
-                { 
+#endif
+                {
+#ifndef  TEST
+                    auto&& ne = field_[clampY][clampX];
+#else               
                     auto&& ne = field_[y][x];
+#endif
                     cell->addNeighbors(ne.get());
                 }
             }
